@@ -325,6 +325,9 @@
   function bindSwipe() {
     const card = $('swipeCard');
     if (!card) return;
+
+    card.style.touchAction = 'pan-y';
+    
     $('passButton').addEventListener('click', () => decideSwipe('pass'));
     $('likeButton').addEventListener('click', () => decideSwipe('like'));
     card.addEventListener('pointerdown', event => {
