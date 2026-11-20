@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14060F">
+<meta name="mobile-web-app-capable" content="yes">
+<title>VOW – chemistry that leads somewhere</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#14060F; --surface:#261022; --ink:#F8EBF0; --muted:#BE9FB0; --line:#4D2644;
+  --accent:#F0A68C; --accent-ink:#2B0F1A; --like:#FF6B8A; --pass:#BBA9E8;
+  color-scheme:dark;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#14060F; --surface:#261022; --ink:#F8EBF0; --muted:#BE9FB0; --line:#4D2644;
+    --accent:#F0A68C; --accent-ink:#2B0F1A; --like:#FF6B8A; --pass:#BBA9E8; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14060F; --surface:#261022; --ink:#F8EBF0; --muted:#BE9FB0; --line:#4D2644;
+  --accent:#F0A68C; --accent-ink:#2B0F1A; --like:#FF6B8A; --pass:#BBA9E8; color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;height:100%;background:radial-gradient(75% 55% at 90% 0%,rgba(230,70,115,.42),transparent 62%),radial-gradient(70% 50% at 0% 100%,rgba(150,40,120,.5),transparent 62%),radial-gradient(40% 30% at 50% 55%,rgba(240,166,140,.10),transparent 70%),linear-gradient(165deg,#1E0818 0%,#12050E 55%,#09030A 100%);background-attachment:fixed;color:var(--ink);font-family:"Instrument Sans",system-ui,sans-serif;display:flex;justify-content:center}
+.app{width:100%;max-width:440px;height:100%;display:flex;flex-direction:column;padding:0 16px}
+header{display:flex;align-items:baseline;justify-content:space-between;padding:18px 4px 10px}
+h1{font-family:Fraunces,Georgia,serif;font-size:1.9rem;margin:0;font-weight:700;letter-spacing:.28em;background:linear-gradient(100deg,#FFE3D2 0%,#F7A5B8 45%,#FF5C8A 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 10px rgba(255,92,138,.55))}
+.orn{display:flex;align-items:center;gap:12px;color:#F27AA0;margin:6px 0 14px;font-size:.9rem;text-shadow:0 0 10px rgba(242,122,160,.8)}
+.orn::before,.orn::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,transparent,rgba(242,122,160,.7))}
+.orn::after{transform:scaleX(-1)}
+header span{color:var(--muted);font-size:.85rem}
+nav{display:flex;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px;margin-bottom:12px}
+nav button{flex:1;border:0;background:none;color:var(--muted);font:600 .9rem inherit;font-family:inherit;padding:9px;border-radius:999px;cursor:pointer}
+nav button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+nav .count{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:0 7px;margin-left:4px;font-size:.75rem}
+main{flex:1;min-height:0;display:flex;flex-direction:column}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.deck{flex:1;position:relative;min-height:0;margin-bottom:12px}
+.card{position:absolute;inset:0;background:var(--surface);border:1px solid var(--line);border-radius:22px;overflow:hidden;display:flex;flex-direction:column;touch-action:pan-y;user-select:none;cursor:grab;will-change:transform}
+.card.behind{transform:scale(.95) translateY(12px);opacity:.7;pointer-events:none}
+.photo{height:36%;min-height:120px;display:grid;place-items:center;font-family:Fraunces,Georgia,serif;font-size:4.5rem;color:#fff;position:relative}
+.stamp{position:absolute;top:16px;padding:4px 12px;border:3px solid;border-radius:8px;font:700 1.2rem Fraunces,serif;opacity:0;transform:rotate(-8deg);background:rgba(0,0,0,.15)}
+.stamp.l{left:16px;color:#C9F5DE;border-color:#C9F5DE}
+.stamp.p{right:16px;color:#FFD1C8;border-color:#FFD1C8;transform:rotate(8deg)}
+.info{padding:16px 18px;overflow:auto;flex:1}
+.info h2{margin:0;font-family:Fraunces,Georgia,serif;font-size:1.6rem;font-weight:700}
+.sub{color:var(--muted);margin:2px 0 10px;font-size:.92rem}
+.intent{background:var(--bg);border-left:4px solid var(--accent);border-radius:6px;padding:10px 12px;margin:10px 0;font-size:.92rem;line-height:1.45}
+.intent b{display:block;font-size:.8rem;color:var(--muted);font-weight:600;margin-bottom:2px}
+.bio{line-height:1.5;margin:10px 0;font-size:.95rem}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags span{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.8rem;color:var(--muted)}
+.actions{display:flex;justify-content:center;gap:28px;padding-bottom:14px}
+.actions button{width:64px;height:64px;border-radius:50%;border:2px solid;background:var(--surface);font-size:1.6rem;cursor:pointer;transition:transform .12s}
+.actions button:active{transform:scale(.92)}
+.pass{border-color:var(--pass);color:var(--pass)}
+.like{border-color:var(--like);color:var(--like)}
+.empty{margin:auto;text-align:center;color:var(--muted);padding:24px;line-height:1.5}
+.empty button{margin-top:12px;background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:10px 20px;font:600 .95rem inherit;font-family:inherit;cursor:pointer}
+.list{display:flex;flex-direction:column;gap:10px;overflow:auto;padding-bottom:16px}
+.m{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;cursor:pointer;text-align:left;width:100%;font:inherit;color:inherit}
+.av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 1.2rem Fraunces,serif;flex:none}
+.m p{margin:0;font-size:.88rem;color:var(--muted)}
+.m strong{display:block}
+.starter{margin-top:6px!important;color:var(--ink)!important}
+.modal{position:fixed;inset:0;background:rgba(10,20,17,.65);display:none;place-items:center;padding:20px;z-index:20}
+.modal.show{display:grid}
+.sheet{background:var(--surface);border-radius:24px;padding:28px 24px;text-align:center;max-width:340px;width:100%}
+.sheet h2{font-family:Fraunces,serif;font-size:1.9rem;margin:0 0 6px}
+.sheet p{color:var(--muted);line-height:1.5;margin:0 0 18px}
+.sheet button{background:var(--accent);color:var(--accent-ink);border:0;border-radius:999px;padding:12px 24px;font:600 1rem inherit;font-family:inherit;cursor:pointer}
+[hidden]{display:none!important}
+.who{display:flex;gap:10px;align-items:center}
+.who button{background:none;border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:5px 12px;font-family:inherit;font-size:.8rem;cursor:pointer}
+.auth{width:100%;max-width:440px;height:100%;overflow:auto;padding:36px 20px 28px}
+.auth .brand{font-size:4.2rem;letter-spacing:.3em;line-height:1.05}
+.lead{font-family:Fraunces,Georgia,serif;font-size:1.5rem;line-height:1.25;margin:8px 0 22px;font-weight:500}
+.seg{display:flex;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px;margin-bottom:18px}
+.seg button{flex:1;border:0;background:none;color:var(--muted);font-weight:600;font-size:.92rem;font-family:inherit;padding:10px;border-radius:999px;cursor:pointer}
+.seg button[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+.field{margin-bottom:12px}
+.field>label,.field>.lab{display:block;font-weight:600;font-size:.88rem;margin-bottom:6px}
+.field input:not([type=radio]):not([type=checkbox]){width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font-size:1rem;font-family:inherit}
+.field input:focus-visible{outline:3px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.field input[aria-invalid="true"]{border-color:var(--pass)}
+.err{color:var(--pass);font-size:.82rem;min-height:1.1em;margin-top:4px}
+.pw{position:relative}
+.pw input{padding-right:64px!important}
+.pw button{position:absolute;right:8px;top:8px;background:none;border:0;color:var(--muted);font-family:inherit;font-weight:600;font-size:.82rem;cursor:pointer;padding:6px}
+.choice{display:flex;gap:8px}
+.choice label{flex:1;position:relative}
+.choice input{position:absolute;opacity:0}
+.choice span{display:block;text-align:center;padding:11px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;font-weight:500}
+.choice input:checked+span{border-color:var(--accent);background:var(--accent);color:var(--accent-ink);font-weight:600}
+.choice input:focus-visible+span{outline:3px solid var(--accent);outline-offset:2px}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:.9rem;line-height:1.4;margin-top:6px}
+.check input{margin-top:3px;width:18px;height:18px;accent-color:var(--accent)}
+.cta{width:100%;background:var(--accent);color:var(--accent-ink);border:0;border-radius:999px;padding:14px;font-weight:600;font-size:1rem;font-family:inherit;cursor:pointer;margin-top:10px}
+.fine{color:var(--muted);font-size:.8rem;text-align:center;margin-top:18px;line-height:1.4}
+.hearts{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.h{position:absolute;font-style:normal;line-height:1;font-size:var(--s);color:#F27AA0;opacity:var(--o);filter:blur(var(--b,0px));text-shadow:0 0 18px rgba(242,122,160,.6);animation:fl var(--d) ease-in-out infinite alternate}
+@keyframes fl{from{transform:translateY(0) rotate(-8deg)}to{transform:translateY(-18px) rotate(8deg)}}
+.auth,.app{position:relative;z-index:1}
+.prog{height:5px;background:var(--line);border-radius:9px;overflow:hidden;margin:8px 0 12px}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,#F0A68C,#FF5C8A);border-radius:9px;transition:width .3s}
+.stepno{color:var(--muted);font-size:.82rem;margin:0}
+.st{font-family:Fraunces,Georgia,serif;font-size:1.7rem;margin:2px 0 4px;font-weight:700}
+.sub2{color:var(--muted);margin:0 0 16px;line-height:1.45}
+.slots{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.slot{aspect-ratio:3/4;border:2px dashed var(--line);border-radius:16px;background:var(--surface);position:relative;overflow:hidden;display:grid;place-items:center;color:var(--muted);cursor:pointer;text-align:center;font-size:.9rem}
+.slot:has(img){border-style:solid}
+.slot:focus-within{outline:3px solid var(--accent)}
+.slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.slot .x{position:absolute;top:6px;right:6px;width:30px;height:30px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;cursor:pointer;z-index:2}
+.slot .main{position:absolute;left:6px;bottom:6px;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:2px 9px;font-size:.72rem;font-weight:600;z-index:2}
+.slot input{position:absolute;opacity:0;width:1px;height:1px}
+.slot b{font-size:2rem;display:block;color:var(--accent);font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.chip{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 14px;font-family:inherit;font-size:.9rem;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.field textarea{width:100%;min-height:120px;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font-size:1rem;font-family:inherit;resize:vertical}
+.field textarea:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.grp{display:block;font-weight:600;font-size:.88rem;margin:16px 0 8px}
+.count2{color:var(--muted);font-size:.78rem;text-align:right}
+.row2{display:flex;gap:10px;margin-top:10px}
+.row2 .cta{margin-top:0;flex:2}
+.ghost{flex:1;background:none;border:1.5px solid var(--line);color:var(--ink);border-radius:999px;padding:14px;font-family:inherit;font-size:.95rem;cursor:pointer}
+.pcard{background:var(--surface);border:1px solid var(--line);border-radius:22px;overflow:hidden}
+img.ph{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.pgal{display:flex;gap:6px;padding:8px 8px 0}
+.pgal img{width:60px;height:60px;object-fit:cover;border-radius:10px}
+.pcard .cta{margin-top:14px}
+html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+button{touch-action:manipulation}
+header{order:1}main{order:2}
+nav{order:3;margin:8px 0 6px;border-radius:24px;padding:6px;box-shadow:0 -6px 24px rgba(0,0,0,.35)}
+nav button{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:.72rem;padding:7px 4px}
+nav .ic{font-size:1.25rem;line-height:1}
+nav .count{position:absolute;top:2px;right:calc(50% - 30px);margin:0}
+.ages{display:flex;gap:10px}.ages .field{flex:1}
+@media (min-width:600px){.app,.auth{height:min(100%,860px);margin:auto;border:1px solid var(--line);border-radius:36px;background:rgba(20,6,15,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);padding-left:22px;padding-right:22px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.h{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="hearts" aria-hidden="true">
+  <i class="h" style="left:-6%;top:6%;--s:150px;--o:.10;--b:6px;--d:11s">♥</i>
+  <i class="h" style="right:-8%;top:38%;--s:170px;--o:.09;--b:7px;--d:13s">♥</i>
+  <i class="h" style="left:10%;bottom:-4%;--s:130px;--o:.10;--b:5px;--d:12s">♥</i>
+  <i class="h" style="left:12%;top:18%;--s:22px;--o:.35;--d:8s">♥</i>
+  <i class="h" style="right:14%;top:10%;--s:30px;--o:.28;--d:10s">♡</i>
+  <i class="h" style="left:78%;top:24%;--s:16px;--o:.40;--d:7s">♥</i>
+  <i class="h" style="left:5%;top:46%;--s:18px;--o:.30;--d:9s">♡</i>
+  <i class="h" style="right:6%;top:62%;--s:26px;--o:.30;--d:11s">♥</i>
+  <i class="h" style="left:30%;top:70%;--s:14px;--o:.35;--d:8s">♥</i>
+  <i class="h" style="left:68%;bottom:8%;--s:32px;--o:.25;--d:12s">♡</i>
+  <i class="h" style="left:44%;top:6%;--s:12px;--o:.40;--d:7s">♥</i>
+  <i class="h" style="left:90%;bottom:26%;--s:18px;--o:.35;--d:9s">♥</i>
+</div>
+<div class="auth" id="auth" hidden>
+  <h1 class="brand">VOW</h1>
+  <div class="orn" aria-hidden="true">♥</div>
+  <p class="lead">Chemistry that leads somewhere.</p>
+  <div id="authBody"></div>
+  <p class="fine">Prototype only: accounts are saved in this browser, not on a server.</p>
+</div>
+<div class="auth" id="setup" hidden></div>
+<div class="app" id="app" hidden>
+  <header><h1>VOW</h1><div class="who"><span id="hi"></span><button id="logout">Log out</button></div></header>
+  <nav role="tablist">
+    <button role="tab" id="tabD" aria-selected="true"><span class="ic">♥</span>Discover</button>
+    <button role="tab" id="tabM" aria-selected="false"><span class="ic">✉</span>Matches<span class="count" id="cnt" hidden>0</span></button>
+    <button role="tab" id="tabP" aria-selected="false"><span class="ic">☻</span>Profile</button>
+  </nav>
+  <main id="main"></main>
+</div>
+<div class="modal" id="modal" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <h2>It’s a match</h2>
+    <p id="mtext"></p>
+    <button id="mclose">Keep swiping</button>
+  </div>
+</div>
+
+<script>
+const people=[
+ {n:"Amina",a:27,c:"Casablanca",j:"Pediatric nurse",when:"Within 1 year",kids:"Wants 2–3 children",val:"Faith, family, honesty",bio:"I cook for my whole family every Sunday. Looking for someone steady, kind, and ready to build a home.",tags:["Hiking","Cooking","Reading"],g:["#2F7D5B","#173D36"],likes:true,q:"What does a perfect Sunday at home look like for you?"},
+ {n:"Yassine",a:31,c:"Rabat",j:"Software engineer",when:"1–2 years",kids:"Wants 2 children",val:"Loyalty, growth, humor",bio:"Quiet on the outside, talkative once I know you. I want a partner to travel with and grow old with.",tags:["Football","Travel","Coffee"],g:["#C27A2C","#6E3B12"],likes:false,q:"Which city would you want us to build a life in?"},
+ {n:"Salma",a:29,c:"Marrakech",j:"Architect",when:"Within 1 year",kids:"Open to kids",val:"Kindness, ambition, family",bio:"I design homes for a living and I’m ready to find the person I’ll share mine with.",tags:["Design","Painting","Tea"],g:["#B5503F","#5E1F14"],likes:true,q:"What’s one non-negotiable in a marriage for you?"},
+ {n:"Omar",a:33,c:"Agadir",j:"Teacher",when:"Within 1 year",kids:"Wants 3 children",val:"Faith, patience, service",bio:"Teacher, volunteer, and terrible at dancing. Seeking a serious relationship that leads to marriage.",tags:["Surf","Volunteering","Books"],g:["#2B6C8F","#10304A"],likes:true,q:"How do you like to spend time with your family?"},
+ {n:"Lina",a:26,c:"Tangier",j:"Doctor",when:"2–3 years",kids:"Wants 2 children",val:"Honesty, learning, calm",bio:"Busy schedule, big heart. I’m looking for someone who respects my work and shares my values.",tags:["Running","Languages","Film"],g:["#7A4E9C","#3A1F52"],likes:false,q:"What would you want your first year of marriage to feel like?"},
+ {n:"Karim",a:30,c:"Fes",j:"Chef",when:"1–2 years",kids:"Open to kids",val:"Generosity, humor, faith",bio:"I show love through food. Ready to meet someone for a real, lasting partnership.",tags:["Cooking","Music","Markets"],g:["#8A6D1E","#43350A"],likes:true,q:"What dish reminds you of home?"}
+];
+const main=document.getElementById('main');
+let idx=0, matches=[], tab='D';
+const $=id=>document.getElementById(id);
+const grad=p=>`linear-gradient(135deg,${p.g[0]},${p.g[1]})`;
+
+function cardHTML(p,top){
+  return `<div class="photo" style="background:${grad(p)}">${p.n[0]}
+    <span class="stamp l">LIKE</span><span class="stamp p">PASS</span></div>
+  <div class="info"><h2>${p.n}, ${p.a}</h2>
+    <div class="sub">${p.c} · ${p.j}</div>
+    <div class="intent"><b>Ready to marry</b>${p.when}. ${p.kids}.</div>
+    <div class="bio">${p.bio}</div>
+    <div class="tags">${[p.val.split(', ').join('|'),...p.tags].join('|').split('|').map(t=>`<span>${t}</span>`).join('')}</div>
+  </div>`;
+}
+
+function renderDiscover(){
+  if(idx>=people.length){
+    main.innerHTML=`<div class="empty"><p>You’ve seen everyone nearby for now.<br>Check your matches or start over.</p><button id="again">Start over</button></div>`;
+    $('again').onclick=()=>{idx=0;renderDiscover()};return;
+  }
+  main.innerHTML=`<div class="deck" id="deck"></div>
+  <div class="actions"><button class="pass" id="bp" aria-label="Pass">✕</button><button class="like" id="bl" aria-label="Like">♥</button></div>`;
+  const deck=$('deck');
+  if(people[idx+1]){const b=document.createElement('div');b.className='card behind';b.innerHTML=cardHTML(people[idx+1]);deck.appendChild(b)}
+  const c=document.createElement('div');c.className='card';c.innerHTML=cardHTML(people[idx]);deck.appendChild(c);
+  attachDrag(c);
+  $('bp').onclick=()=>fling(c,-1);$('bl').onclick=()=>fling(c,1);
+}
+
+function attachDrag(c){
+  let sx=0,dx=0,drag=false;
+  const l=c.querySelector('.stamp.l'),p=c.querySelector('.stamp.p');
+  c.onpointerdown=e=>{drag=true;sx=e.clientX;c.setPointerCapture(e.pointerId);c.style.transition='none'};
+  c.onpointermove=e=>{if(!drag)return;dx=e.clientX-sx;
+    c.style.transform=`translateX(${dx}px) rotate(${dx/18}deg)`;
+    l.style.opacity=Math.max(0,dx/100);p.style.opacity=Math.max(0,-dx/100)};
+  c.onpointerup=()=>{if(!drag)return;drag=false;
+    if(Math.abs(dx)>100)fling(c,dx>0?1:-1);
+    else{c.style.transition='transform .2s';c.style.transform='';l.style.opacity=p.style.opacity=0}
+    dx=0};
+}
+
+function fling(c,dir){
+  const person=people[idx];
+  c.style.transition='transform .28s ease-out,opacity .28s';
+  c.style.transform=`translateX(${dir*500}px) rotate(${dir*25}deg)`;c.style.opacity=0;
+  setTimeout(()=>{
+    idx++;
+    if(dir===1&&person.likes){matches.push(person);updateCount();
+      $('mtext').textContent=`You and ${person.n} both want something serious. Say hello first.`;
+      $('modal').classList.add('show');$('mclose').focus()}
+    renderDiscover();
+  },260);
+}
+
+function updateCount(){const c=$('cnt');c.hidden=!matches.length;c.textContent=matches.length}
+
+function renderMatches(){
+  if(!matches.length){main.innerHTML=`<div class="empty"><p>No matches yet.<br>Keep swiping. When you both like each other, they show up here.</p></div>`;return}
+  main.innerHTML=`<div class="list">${matches.map((p,i)=>`
+    <button class="m" data-i="${i}"><div class="av" style="background:${grad(p)}">${p.n[0]}</div>
+    <div><strong>${p.n}, ${p.a} · ${p.c}</strong><p>${p.when} · ${p.kids}</p><p class="starter" hidden>Conversation starter: ${p.q}</p></div></button>`).join('')}</div>`;
+  main.querySelectorAll('.m').forEach(b=>b.onclick=()=>{const s=b.querySelector('.starter');s.hidden=!s.hidden});
+}
+
+function setTab(t){
+  tab=t;$('tabD').setAttribute('aria-selected',t==='D');$('tabM').setAttribute('aria-selected',t==='M');
+  $('tabP').setAttribute('aria-selected',t==='P');t==='D'?renderDiscover():t==='M'?renderMatches():renderProfile();
+}
+$('tabD').onclick=()=>setTab('D');$('tabM').onclick=()=>setTab('M');$('tabP').onclick=()=>setTab('P');
+$('mclose').onclick=()=>$('modal').classList.remove('show');
+/* ---------- Account: sign up / log in ---------- */
+const store={
+  users(){try{return JSON.parse(localStorage.getItem('vow_users')||'[]')}catch(e){return []}},
+  saveUsers(u){try{localStorage.setItem('vow_users',JSON.stringify(u))}catch(e){}},
+  session(){try{return localStorage.getItem('vow_session')}catch(e){return null}},
+  setSession(v){try{v?localStorage.setItem('vow_session',v):localStorage.removeItem('vow_session')}catch(e){}}
+};
+async function hash(s){
+  try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('vow:'+s));
+    return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+  catch(e){return btoa(unescape(encodeURIComponent('vow:'+s)))}
+}
+let mode='signup';
+const fieldHTML=(id,label,type,extra='')=>`<div class="field"><label for="${id}">${label}</label><input id="${id}" type="${type}" ${extra}><div class="err" id="e_${id}" aria-live="polite"></div></div>`;
+const pwHTML=(auto)=>`<div class="field"><label for="pw">Password</label><div class="pw"><input id="pw" type="password" autocomplete="${auto}"><button type="button" id="eye">Show</button></div><div class="err" id="e_pw" aria-live="polite"></div></div>`;
+
+function renderAuth(){
+  const s=mode==='signup';
+  $('authBody').innerHTML=`
+  <div class="seg" role="tablist">
+    <button type="button" role="tab" data-m="signup" aria-selected="${s}">Create account</button>
+    <button type="button" role="tab" data-m="login" aria-selected="${!s}">Log in</button>
+  </div>
+  <form id="authForm" novalidate>
+    ${s?fieldHTML('nm','First name','text','autocomplete="given-name"'):''}
+    ${fieldHTML('em','Email','email','autocomplete="email" inputmode="email"')}
+    ${pwHTML(s?'new-password':'current-password')}
+    ${s?`
+    <div class="field"><span class="lab" id="gl">I am</span>
+      <div class="choice" role="radiogroup" aria-labelledby="gl">
+        <label><input type="radio" name="g" value="man"><span>A man</span></label>
+        <label><input type="radio" name="g" value="woman"><span>A woman</span></label>
+      </div><div class="err" id="e_g" aria-live="polite"></div></div>
+    ${fieldHTML('ag','Age','number','min="18" max="99" inputmode="numeric"')}
+    <label class="check"><input type="checkbox" id="intent"><span>I’m looking for a serious relationship that can lead to marriage.</span></label>
+    <div class="err" id="e_intent" aria-live="polite"></div>`:''}
+    <div class="err" id="e_form" aria-live="polite"></div>
+    <button class="cta" type="submit">${s?'Create account':'Log in'}</button>
+  </form>`;
+  document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;renderAuth()});
+  $('eye').onclick=()=>{const i=$('pw'),h=i.type==='password';i.type=h?'text':'password';$('eye').textContent=h?'Hide':'Show'};
+  $('authForm').onsubmit=submitAuth;
+}
+
+function setErr(id,msg){
+  const e=$('e_'+id);if(e)e.textContent=msg||'';
+  const inp=$(id);if(inp)inp.setAttribute('aria-invalid',msg?'true':'false');
+}
+
+async function submitAuth(ev){
+  ev.preventDefault();
+  const s=mode==='signup',email=$('em').value.trim().toLowerCase(),pw=$('pw').value;
+  ['nm','em','pw','g','ag','intent','form'].forEach(i=>setErr(i,''));
+  let ok=true;const bad=(id,m)=>{setErr(id,m);ok=false};
+  if(s){
+    const nm=$('nm').value.trim(),ag=parseInt($('ag').value,10),g=document.querySelector('input[name=g]:checked');
+    if(nm.length<2)bad('nm','Enter your first name.');
+    if(!/^\S+@\S+\.\S+$/.test(email))bad('em','Enter a valid email address.');
+    if(pw.length<8)bad('pw','Use at least 8 characters.');
+    if(!g)bad('g','Choose one option.');
+    if(!(ag>=18))bad('ag','You must be 18 or older to join.');
+    if(!$('intent').checked)bad('intent','Please confirm to continue.');
+    if(!ok)return;
+    const users=store.users();
+    if(users.some(u=>u.email===email)){setErr('em','This email already has an account. Log in instead.');return}
+    const user={name:nm,email,age:ag,gender:g.value,pw:await hash(pw)};
+    users.push(user);store.saveUsers(users);store.setSession(email);enter(user);
+  }else{
+    if(!email)bad('em','Enter your email.');
+    if(!pw)bad('pw','Enter your password.');
+    if(!ok)return;
+    const user=store.users().find(u=>u.email===email);
+    if(!user||user.pw!==await hash(pw)){setErr('form','Email or password is incorrect.');return}
+    store.setSession(email);enter(user);
+  }
+}
+
+function enter(user){
+  me=user;$('auth').hidden=true;if(!user.profile||!user.profile.wants||!user.profile.orient){startSetup(false);return}$('setup').hidden=true;$('app').hidden=false;
+  $('hi').textContent='Hi, '+user.name;
+  idx=0;matches=[];updateCount();setTab('D');
+}
+$('logout').onclick=()=>{store.setSession(null);$('app').hidden=true;$('auth').hidden=false;mode='login';renderAuth()};
+
+/* ---------- Profile setup ---------- */
+let me=null,draft=null,step=0,editing=false;
+const HOBBIES=['Cooking','Travel','Reading','Hiking','Fitness','Football','Swimming','Music','Photography','Gardening','Movies','Art','Volunteering','Gaming','Coffee','Surfing'];
+const VALUES=['Faith','Family','Honesty','Loyalty','Kindness','Ambition','Humor','Patience','Growth','Respect'];
+const TIMES=['Within 1 year','1–2 years','2–3 years','Not sure yet'];
+const KIDS=['Want children','Open to children','Don’t want children','Already have children'];
+const SHOW=['Women','Men','Everyone'];
+const ORIENT=['Straight','Gay / Lesbian','Bisexual','Prefer not to say'];
+const WANT_E=['Respectful','Caring','Faithful','Ambitious','Funny','Educated','Family-oriented','Calm','Generous','Independent','Good listener','Adventurous'];
+const WANT_W=['Caring','Family-oriented','Faithful','Modest','Ambitious','Funny','Educated','Good cook','Independent','Calm','Elegant','Adventurous'];
+const WANT_M=['Respectful','Responsible','Faithful','Protective','Ambitious','Funny','Educated','Hardworking','Calm','Generous','Family-oriented','Good listener'];
+const FAITH=['Very important','Somewhat important','Not important'];
+const TITLES=[['Add your photos','Clear photos get far more matches. Add 1 to 4.'],['Tell us about you','A few honest lines go a long way.'],['Hobbies and values','Pick what describes you best.'],['Your ideal partner','Tell us who you hope to meet.'],['Your marriage goals','This helps us show you people who want the same.']];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function readPhoto(file){return new Promise(res=>{const r=new FileReader();r.onerror=()=>res(null);r.onload=()=>{const im=new Image();im.onerror=()=>res(null);im.onload=()=>{const sc=Math.min(1,520/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.7))};im.src=r.result};r.readAsDataURL(file)})}
+function startSetup(edit){
+  editing=edit;step=0;
+  draft=Object.assign({photos:[],bio:'',city:'',job:'',hobbies:[],values:[],when:'',kids:'',show:me.gender==='man'?'Women':'Men',ageMin:Math.max(18,me.age-6),ageMax:Math.min(99,me.age+8),wants:[],faith:'',partnerNote:'',orient:''},me.profile?JSON.parse(JSON.stringify(me.profile)):{});
+  $('app').hidden=true;$('auth').hidden=true;$('setup').hidden=false;renderSetup();
+}
+const setStepErr=m=>{const e=$('e_step');if(e)e.textContent=m||''};
+function chipsHTML(key,opts,multi){
+  return `<div class='chips'>${opts.map(o=>{const on=multi?draft[key].includes(o):draft[key]===o;return `<button type='button' class='chip' data-k='${key}' data-m='${multi?1:0}' data-v='${o}' aria-pressed='${on}'>${o}</button>`}).join('')}</div>`;
+}
+function stepBody(){
+  if(step===0){
+    let h=`<div class='slots'>`;
+    for(let i=0;i<4;i++){const p=draft.photos[i];
+      h+=p?`<div class='slot'><img src='${p}' alt='Your photo ${i+1}'>${i===0?`<span class='main'>Main</span>`:''}<button type='button' class='x' data-rm='${i}' aria-label='Remove photo ${i+1}'>✕</button></div>`
+      :`<label class='slot'><input type='file' accept='image/*' multiple data-add='1'><span><b>+</b>${i===0?'Main photo':'Add photo'}</span></label>`}
+    return h+`</div>`;
+  }
+  if(step===1)return `<div class='field'><label for='bio'>About me</label><textarea id='bio' maxlength='300' placeholder='Who you are, what you value, what you’re looking for…'>${esc(draft.bio)}</textarea><div class='count2' id='bc'></div></div>${fieldHTML('ci','City','text','autocomplete="address-level2"')}${fieldHTML('jb','Job or study','text')}<span class='grp'>My orientation</span>${chipsHTML('orient',ORIENT,0)}`;
+  if(step===2)return `<span class='grp'>Hobbies (pick at least 3)</span>${chipsHTML('hobbies',HOBBIES,1)}<span class='grp'>What matters most to you (pick 2 to 4)</span>${chipsHTML('values',VALUES,1)}`;
+  if(step===3){const w=draft.show==='Women',e=draft.show==='Everyone';return `<span class='grp'>Preferred age</span><div class='ages'><div class='field'><label for='a1'>From</label><input id='a1' type='number' min='18' max='99' inputmode='numeric'></div><div class='field'><label for='a2'>To</label><input id='a2' type='number' min='18' max='99' inputmode='numeric'></div></div><span class='grp'>${e?'How you want them to be':w?'How you want her to be':'How you want him to be'} (pick 3 to 6)</span>${chipsHTML('wants',e?WANT_E:w?WANT_W:WANT_M,1)}<span class='grp'>How important is faith in a partner?</span>${chipsHTML('faith',FAITH,0)}<div class='field' style='margin-top:14px'><label for='pn'>In your own words (optional)</label><textarea id='pn' maxlength='200' placeholder='Anything else that matters to you…'>${esc(draft.partnerNote)}</textarea></div>`}
+  return `<span class='grp'>I’m interested in</span>${chipsHTML('show',SHOW,0)}<span class='grp'>I want to marry</span>${chipsHTML('when',TIMES,0)}<span class='grp'>Children</span>${chipsHTML('kids',KIDS,0)}`;
+}
+function renderSetup(){
+  const first=step===0;
+  $('setup').innerHTML=`<h1>VOW</h1><div class='prog'><i style='width:${(step+1)*20}%'></i></div>
+  <p class='stepno'>Step ${step+1} of 5</p><h2 class='st'>${step===3?(draft.show==='Women'?'The woman you’re looking for':draft.show==='Men'?'The man you’re looking for':'The person you’re looking for'):TITLES[step][0]}</h2><p class='sub2'>${TITLES[step][1]}</p>
+  ${stepBody()}<div class='err' id='e_step' aria-live='polite'></div>
+  <div class='row2'><button type='button' class='ghost' id='sBack'>${first?(editing?'Cancel':'Log out'):'Back'}</button><button type='button' class='cta' id='sNext'>${step===4?(editing?'Save profile':'Finish'):'Next'}</button></div>`;
+  $('setup').scrollTop=0;
+  const S=$('setup');
+  S.querySelectorAll('input[data-add]').forEach(inp=>inp.onchange=async()=>{
+    setStepErr('');
+    for(const f of [...inp.files]){if(draft.photos.length>=4)break;const d=await readPhoto(f);if(d)draft.photos.push(d);else setStepErr('One file could not be read as an image.')}
+    const m=$('e_step').textContent;renderSetup();setStepErr(m);
+  });
+  S.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{draft.photos.splice(+b.dataset.rm,1);renderSetup()});
+  S.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.k,v=b.dataset.v;setStepErr('');
+    if(b.dataset.m==='1'){const a=draft[k],i=a.indexOf(v);
+      if(i>-1)a.splice(i,1);else{if(k==='values'&&a.length>=4){setStepErr('Choose up to 4 values.');return}if(k==='wants'&&a.length>=6){setStepErr('Choose up to 6 qualities.');return}a.push(v)}
+      b.setAttribute('aria-pressed',i===-1)}
+    else{draft[k]=v;if(k==='orient'){const opp=me.gender==='man'?'Women':'Men',same=me.gender==='man'?'Men':'Women';draft.show=v==='Straight'?opp:v==='Gay / Lesbian'?same:v==='Bisexual'?'Everyone':(draft.show||opp)}S.querySelectorAll('.chip[data-k='+k+']').forEach(x=>x.setAttribute('aria-pressed',x===b))}
+  });
+  if(step===1){
+    const bio=$('bio'),upd=()=>{draft.bio=bio.value;$('bc').textContent=bio.value.length+' / 300'};
+    bio.oninput=upd;upd();
+    $('ci').value=draft.city;$('jb').value=draft.job;
+    $('ci').oninput=e=>draft.city=e.target.value;$('jb').oninput=e=>draft.job=e.target.value;
+  }
+  if(step===3){
+    $('a1').value=draft.ageMin;$('a2').value=draft.ageMax;
+    $('a1').oninput=e=>draft.ageMin=e.target.value;$('a2').oninput=e=>draft.ageMax=e.target.value;
+    const pn=$('pn');pn.oninput=()=>draft.partnerNote=pn.value;
+  }
+  $('sBack').onclick=()=>{
+    if(step>0){step--;renderSetup()}
+    else if(editing)enter(me);
+    else{store.setSession(null);me=null;$('setup').hidden=true;$('auth').hidden=false;mode='login';renderAuth()}
+  };
+  $('sNext').onclick=()=>{const m=validate();if(m){setStepErr(m);return}if(step<4){step++;renderSetup()}else finish()};
+}
+function validate(){
+  const d=draft;
+  if(step===0&&!d.photos.length)return 'Add at least one photo.';
+  if(step===1){if(d.bio.trim().length<30)return 'Write at least 30 characters about yourself.';if(d.city.trim().length<2)return 'Enter your city.';if(!d.orient)return 'Choose your orientation.'}
+  if(step===2){if(d.hobbies.length<3)return 'Pick at least 3 hobbies.';if(d.values.length<2)return 'Pick at least 2 values.'}
+  if(step===3){const a=parseInt(d.ageMin,10),b=parseInt(d.ageMax,10);if(!(a>=18&&b<=99&&a<=b))return 'Enter a valid age range (18 to 99).';if(d.wants.length<3)return 'Pick at least 3 qualities.';if(!d.faith)return 'Tell us how important faith is.'}
+  if(step===4){if(!d.show)return 'Choose who you are interested in.';if(!d.when)return 'Choose your marriage timeline.';if(!d.kids)return 'Choose your plans for children.'}
+  return '';
+}
+function finish(){
+  const users=store.users(),u=users.find(x=>x.email===me.email);
+  if(!u){setStepErr('Account not found. Please log in again.');return}
+  u.profile=draft;store.saveUsers(users);
+  const chk=store.users().find(x=>x.email===me.email);
+  if(!chk||!chk.profile){setStepErr('Your photos are too large to save here. Remove one and try again.');return}
+  enter(chk);
+}
+function renderProfile(){
+  const p=me.profile;
+  main.innerHTML=`<div class='list'><div class='pcard'><img class='ph' src='${p.photos[0]}' alt='Your main photo'>
+  ${p.photos.length>1?`<div class='pgal'>${p.photos.slice(1).map(x=>`<img src='${x}' alt=''>`).join('')}</div>`:''}
+  <div class='info'><h2>${esc(me.name)}, ${me.age}</h2><div class='sub'>${esc(p.city)}${p.job?' · '+esc(p.job):''}</div>
+  <div class='intent'><b>Ready to marry</b>${esc(p.when)}. ${esc(p.kids)}. Orientation: ${esc(p.orient||'')}. Interested in: ${esc(p.show)}.</div>
+  <div class='bio'>${esc(p.bio)}</div>
+  <div class='tags'>${[...p.values,...p.hobbies].map(t=>`<span>${esc(t)}</span>`).join('')}</div>
+  <div class='intent'><b>Looking for ${p.show==='Women'?'a woman':p.show==='Men'?'a man':'a partner'} aged ${esc(p.ageMin)}–${esc(p.ageMax)}</b>${(p.wants||[]).map(esc).join(', ')}. Faith: ${esc(p.faith||'')}.${p.partnerNote?' “'+esc(p.partnerNote)+'”':''}</div>
+  <button class='cta' id='editP'>Edit profile</button></div></div></div>`;
+  $('editP').onclick=()=>startSetup(true);
+}
+
+(function boot(){
+  const em=store.session(),user=em&&store.users().find(u=>u.email===em);
+  if(user)enter(user);else{$('auth').hidden=false;renderAuth()}
+})();
+</script>
+</body>
+</html>

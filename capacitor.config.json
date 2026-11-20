@@ -1,0 +1,11 @@
+{
+  "appId": "com.yourname.vow",
+  "appName": "VOW",
+  "webDir": "www",
+  "backgroundColor": "#14060F",
+  "ios": { "contentInset": "never" },
+  "plugins": {
+    "SplashScreen": { "backgroundColor": "#14060F", "launchAutoHide": true },
+    "StatusBar": { "style": "DARK", "backgroundColor": "#14060F" }
+  }
+}
