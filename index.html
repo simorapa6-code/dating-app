@@ -1,4 +1,55 @@
 <!DOCTYPE html>
+<!--
+CHAT SETUP (one time): copy the SQL below into Supabase > SQL Editor > New query > Run.
+
+create table if not exists public.messages (
+  id uuid primary key default gen_random_uuid(),
+  sender_id uuid not null references auth.users(id) on delete cascade,
+  receiver_id uuid not null references auth.users(id) on delete cascade,
+  content text not null check (char_length(content) between 1 and 1000),
+  created_at timestamptz not null default now(),
+  read_at timestamptz
+);
+
+create index if not exists messages_pair_idx on public.messages (sender_id, receiver_id, created_at);
+create index if not exists messages_receiver_idx on public.messages (receiver_id, read_at);
+
+- - True only when both users liked each other
+create or replace function public.is_match(a uuid, b uuid)
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (select 1 from public.swipes where user_id = a and target_user_id = b and action = 'like')
+     and exists (select 1 from public.swipes where user_id = b and target_user_id = a and action = 'like');
+$$;
+
+alter table public.messages enable row level security;
+
+drop policy if exists "read own messages" on public.messages;
+create policy "read own messages" on public.messages
+  for select to authenticated
+  using (auth.uid() = sender_id or auth.uid() = receiver_id);
+
+- - Only matched users can message each other
+drop policy if exists "send to matches only" on public.messages;
+create policy "send to matches only" on public.messages
+  for insert to authenticated
+  with check (auth.uid() = sender_id and public.is_match(sender_id, receiver_id));
+
+- - Receiver can mark messages as read
+drop policy if exists "mark received as read" on public.messages;
+create policy "mark received as read" on public.messages
+  for update to authenticated
+  using (auth.uid() = receiver_id)
+  with check (auth.uid() = receiver_id);
+
+- - Realtime (instant delivery)
+alter publication supabase_realtime add table public.messages;
+
+-->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -11,6 +62,11 @@
 :root{--bg:#14060f;--panel:#21101d;--panel2:#2b1726;--pink:#f06b9b;--rose:#ff9dbb;--cream:#fff4f5;--muted:#bdaab6;--line:#493044;--green:#8bd6ad}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#3b1730 0,#14060f 55%);color:var(--cream);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}button,input,select,textarea{font:inherit}button{cursor:pointer}.shell{width:min(100%,520px);margin:auto;min-height:100vh;padding:22px 18px 100px}.brand{font-family:Georgia,serif;font-size:35px;letter-spacing:5px;text-align:center;margin:16px 0 4px}.tag{text-align:center;color:var(--muted);font-size:12px;letter-spacing:1.5px;margin-bottom:26px}.panel{background:linear-gradient(145deg,rgba(52,27,47,.96),rgba(31,13,27,.98));border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:0 18px 50px #0005}.eyebrow{color:var(--rose);font-size:11px;letter-spacing:2px;text-transform:uppercase}.heading{font:30px Georgia,serif;margin:9px 0}.sub{color:var(--muted);line-height:1.5;font-size:14px}.field{display:block;margin:15px 0}.field span{display:block;color:#e8cbd8;font-size:12px;margin:0 0 7px}.field input,.field select,.field textarea{width:100%;border:1px solid #56394d;background:#170a14;color:var(--cream);padding:13px 14px;border-radius:13px;outline:none}.field textarea{min-height:90px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--pink)}.btn{border:0;border-radius:14px;padding:14px 18px;background:linear-gradient(100deg,#e85d91,#b93e79);color:white;font-weight:700;width:100%;margin-top:8px}.btn.secondary{background:#382237;border:1px solid #634359}.btn:disabled{opacity:.5;cursor:wait}.switch{text-align:center;color:var(--muted);font-size:13px;margin-top:17px}.link{color:var(--rose);background:none;border:0;text-decoration:underline}.msg{margin-top:13px;color:var(--rose);font-size:13px;line-height:1.45}.hidden{display:none!important}.topline{display:flex;justify-content:space-between;align-items:center;margin:8px 0 20px}.smallbrand{font:24px Georgia,serif;letter-spacing:3px}.logout{background:none;color:var(--muted);border:1px solid var(--line);padding:8px 12px;border-radius:10px}.tabs{position:fixed;bottom:0;left:0;right:0;background:#180a15ed;backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;justify-content:center;gap:6px;padding:10px max(12px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom));z-index:5}.tabs button{width:min(31%,155px);background:transparent;border:0;color:var(--muted);padding:9px 4px;border-radius:12px;font-size:12px}.tabs button.active{background:#432238;color:#ffd6e5}.profile-card{margin-top:14px;padding:18px;border:1px solid var(--line);background:#281526;border-radius:20px}.avatar{width:68px;height:68px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#f48eaf,#713354);font:28px Georgia,serif;margin-bottom:12px}.chip{display:inline-block;border:1px solid #69445b;color:#f6d4e2;border-radius:30px;padding:6px 10px;font-size:11px;margin:4px 3px 0 0}.empty{text-align:center;padding:36px 12px;color:var(--muted)}.notice{font-size:11px;color:#bdaab6;line-height:1.5;margin-top:16px}.stepbar{height:4px;background:#45263b;border-radius:9px;margin:15px 0}.stepbar i{display:block;height:100%;background:var(--pink);border-radius:9px}.row{display:flex;gap:10px}.row>*{flex:1}
 .swipe-stage{position:relative;margin-top:18px;min-height:390px;touch-action:pan-y;user-select:none}.swipe-card{position:absolute;inset:0;background:linear-gradient(155deg,#382037,#21101d);border:1px solid #69445b;border-radius:22px;padding:22px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;box-shadow:0 15px 35px #0006;transition:transform .22s ease,opacity .22s ease;cursor:grab}.swipe-card:active{cursor:grabbing}.swipe-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 18%,rgba(240,107,155,.35),transparent 42%),linear-gradient(180deg,transparent 15%,rgba(12,4,11,.9) 100%);pointer-events:none}.swipe-card>*{position:relative;z-index:1}.sample-art{position:absolute!important;inset:0;display:grid;place-items:center;font:110px Georgia,serif;color:#ffd6e5;background:linear-gradient(135deg,#8b456c,#3b1b36);opacity:.72}.sample-art span{filter:drop-shadow(0 8px 15px #210b1c)}.swipe-card .eyebrow{margin-bottom:4px}.swipe-card h3{font:32px Georgia,serif;margin:5px 0}.swipe-card .sub{color:#f0dbe5}.swipe-stamp{position:absolute!important;top:28px;z-index:2;font-size:25px;font-weight:900;letter-spacing:3px;padding:7px 13px;border:4px solid;border-radius:10px;opacity:0}.swipe-stamp.like{left:20px;color:#8bd6ad;transform:rotate(-14deg)}.swipe-stamp.pass{right:20px;color:#ff9dbb;transform:rotate(14deg)}.swipe-actions{display:flex;justify-content:center;align-items:center;gap:24px;margin:18px 0 4px}.swipe-actions button{width:62px;height:62px;border-radius:50%;border:1px solid #69445b;background:#382237;color:#fff;font-size:27px;box-shadow:0 8px 22px #0004}.swipe-actions .like-btn{background:linear-gradient(135deg,#e85d91,#b93e79);border:0;font-size:30px}.swipe-actions button:active{transform:scale(.94)}.swipe-help{text-align:center;color:var(--muted);font-size:11px;margin-top:8px}
+
+.match-actions{display:flex;gap:10px;align-items:center;margin-top:12px}.match-actions .btn{margin-top:0;padding:11px 16px;width:auto;flex:1}.unread-dot{display:inline-block;min-width:20px;height:20px;border-radius:10px;background:var(--pink);color:#fff;font-size:11px;font-weight:700;line-height:20px;text-align:center;padding:0 6px;margin-left:6px}
+.chat-head{display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--line)}.chat-back{background:#382237;border:1px solid #634359;color:#fff;width:38px;height:38px;border-radius:12px;font-size:18px;flex:none}.chat-head .avatar{width:44px;height:44px;font-size:19px;margin:0;flex:none}.chat-head h2{font:21px Georgia,serif;margin:0}.chat-head .sub{font-size:12px;margin:2px 0 0}
+.chat-box{height:min(52vh,460px);overflow-y:auto;padding:16px 2px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth}.bubble{max-width:78%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.45;word-wrap:break-word;overflow-wrap:anywhere;white-space:pre-wrap}.bubble.me{align-self:flex-end;background:linear-gradient(100deg,#e85d91,#b93e79);border-bottom-right-radius:5px}.bubble.them{align-self:flex-start;background:#382237;border:1px solid #56394d;border-bottom-left-radius:5px}.bubble time{display:block;font-size:10px;opacity:.65;margin-top:4px;text-align:right}.chat-empty{margin:auto;text-align:center;color:var(--muted);font-size:13px;line-height:1.6;padding:20px}.chat-empty b{display:block;font:22px Georgia,serif;color:var(--cream);margin-bottom:6px}
+.chat-form{display:flex;gap:10px;align-items:flex-end;border-top:1px solid var(--line);padding-top:14px}.chat-form textarea{flex:1;border:1px solid #56394d;background:#170a14;color:var(--cream);padding:12px 14px;border-radius:16px;outline:none;resize:none;max-height:110px;min-height:46px;line-height:1.4}.chat-form textarea:focus{border-color:var(--pink)}.chat-form button{width:48px;height:46px;border:0;border-radius:50%;background:linear-gradient(135deg,#e85d91,#b93e79);color:#fff;font-size:19px;flex:none}.chat-form button:disabled{opacity:.5}
 </style>
 </head>
 <body>
@@ -69,7 +125,20 @@
       <div id="matchesPanel" class="panel hidden">
         <div class="eyebrow">Your connections</div><h2 class="heading">Matches</h2>
         <div id="matchesList"><div class="empty">Loading your matches…</div></div>
-        <p class="notice">A match appears when both people like each other. Chat is not connected yet.</p>
+        <p class="notice">A match appears when both people like each other. Tap Message to start chatting.</p>
+      </div>
+      <div id="chatPanel" class="panel hidden">
+        <div class="chat-head">
+          <button class="chat-back" id="chatBack" type="button" aria-label="Back to matches">←</button>
+          <div class="avatar" id="chatAvatar">V</div>
+          <div><h2 id="chatName">Chat</h2><p class="sub" id="chatSub"></p></div>
+        </div>
+        <div class="chat-box" id="chatBox" aria-live="polite"></div>
+        <form class="chat-form" id="chatForm">
+          <textarea id="chatInput" rows="1" maxlength="1000" placeholder="Write a message…" aria-label="Message"></textarea>
+          <button type="submit" id="chatSend" aria-label="Send">➤</button>
+        </form>
+        <div id="chatMsg" class="msg"></div>
       </div>
       <div id="myProfilePanel" class="panel hidden">
         <div class="eyebrow">Your account</div><h2 class="heading">My profile</h2>
@@ -100,6 +169,12 @@
   let swipeStartX = 0;
   let activeCard = null;
   let busySwipe = false;
+  let matchList = [];
+  let chatPartner = null;
+  let chatPoll = null;
+  let chatChannel = null;
+  let chatSeen = new Set();
+  let unreadCounts = {};
 
   function message(id, text, error = false) {
     const el = $(id);
@@ -430,21 +505,168 @@
       const { data: matchedProfiles, error: matchedError } = await client.from('profiles')
         .select('id,full_name,age,city,country,bio').in('id', matchIds);
       if (matchedError) throw matchedError;
+      matchList = matchedProfiles || [];
+      await loadUnread();
       list.innerHTML = (matchedProfiles || []).map(person => `
         <div class="profile-card"><div class="avatar">${escapeHTML((person.full_name || 'V').trim().charAt(0).toUpperCase())}</div>
         <h3 class="heading">${escapeHTML(person.full_name || 'VOW member')}${person.age ? ', ' + Number(person.age) : ''}</h3>
         <p class="sub">${escapeHTML([person.city, person.country].filter(Boolean).join(', '))}</p>
-        <span class="chip">♡ Mutual match</span></div>`).join('') || '<div class="empty">No matches to show.</div>';
+        <span class="chip">♡ Mutual match</span>
+        <div class="match-actions"><button class="btn" type="button" data-chat="${escapeHTML(person.id)}">💬 Message${unreadCounts[person.id] ? `<span class="unread-dot">${unreadCounts[person.id]}</span>` : ''}</button></div></div>`).join('') || '<div class="empty">No matches to show.</div>';
+      list.querySelectorAll('[data-chat]').forEach(btn => btn.addEventListener('click', () => {
+        const person = matchList.find(item => item.id === btn.dataset.chat);
+        if (person) openChat(person);
+      }));
     } catch (error) {
       list.innerHTML = '<div class="empty">Could not load matches.</div>';
       console.error('VOW matches error:', error);
     }
   }
 
+  // ---------- CHAT ----------
+  function timeLabel(iso) {
+    const d = new Date(iso);
+    if (isNaN(d)) return '';
+    const sameDay = d.toDateString() === new Date().toDateString();
+    return sameDay ? d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+      : d.toLocaleDateString([], {day:'numeric', month:'short'}) + ' ' + d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  }
+
+  async function loadUnread() {
+    try {
+      const { data, error } = await client.from('messages').select('sender_id').eq('receiver_id', currentUser.id).is('read_at', null);
+      if (error) throw error;
+      unreadCounts = {};
+      (data || []).forEach(m => { unreadCounts[m.sender_id] = (unreadCounts[m.sender_id] || 0) + 1; });
+    } catch (e) { unreadCounts = {}; }
+  }
+
+  function addBubble(m) {
+    if (!m || chatSeen.has(m.id)) return;
+    chatSeen.add(m.id);
+    const box = $('chatBox');
+    const empty = box.querySelector('.chat-empty');
+    if (empty) empty.remove();
+    const mine = m.sender_id === currentUser.id;
+    const el = document.createElement('div');
+    el.className = 'bubble ' + (mine ? 'me' : 'them');
+    el.textContent = m.content;
+    const t = document.createElement('time');
+    t.textContent = timeLabel(m.created_at);
+    el.appendChild(t);
+    const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 120;
+    box.appendChild(el);
+    if (mine || nearBottom) box.scrollTop = box.scrollHeight;
+  }
+
+  async function markRead() {
+    if (!chatPartner) return;
+    try {
+      await client.from('messages').update({ read_at: new Date().toISOString() })
+        .eq('sender_id', chatPartner.id).eq('receiver_id', currentUser.id).is('read_at', null);
+      delete unreadCounts[chatPartner.id];
+    } catch (e) { /* non-critical */ }
+  }
+
+  async function fetchMessages(initial = false) {
+    if (!chatPartner) return;
+    const me = currentUser.id, other = chatPartner.id;
+    const { data, error } = await client.from('messages').select('*')
+      .or(`and(sender_id.eq.${me},receiver_id.eq.${other}),and(sender_id.eq.${other},receiver_id.eq.${me})`)
+      .order('created_at', { ascending: true }).limit(300);
+    if (error) throw error;
+    if (initial && !(data || []).length) {
+      $('chatBox').innerHTML = `<div class="chat-empty"><b>It's a match ♡</b>Say hello to ${escapeHTML(chatPartner.full_name || 'your match')} and start the conversation.</div>`;
+    }
+    (data || []).forEach(addBubble);
+    if ((data || []).some(m => m.sender_id === other && !m.read_at)) markRead();
+  }
+
+  async function openChat(person) {
+    stopChat();
+    chatPartner = person;
+    chatSeen = new Set();
+    $('matchesPanel').classList.add('hidden');
+    $('chatPanel').classList.remove('hidden');
+    $('chatAvatar').textContent = (person.full_name || 'V').trim().charAt(0).toUpperCase();
+    $('chatName').textContent = person.full_name || 'VOW member';
+    $('chatSub').textContent = [person.city, person.country].filter(Boolean).join(', ') || 'Mutual match';
+    $('chatBox').innerHTML = '<div class="chat-empty">Loading messages…</div>';
+    message('chatMsg', '');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    try {
+      await fetchMessages(true);
+      $('chatBox').scrollTop = $('chatBox').scrollHeight;
+    } catch (error) {
+      $('chatBox').innerHTML = '<div class="chat-empty">Could not load messages.</div>';
+      message('chatMsg', 'Chat is not set up yet. Run the messages SQL in Supabase first. (' + (error.message || '') + ')', true);
+      return;
+    }
+    try {
+      chatChannel = client.channel('vow-chat-' + currentUser.id + '-' + person.id)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, payload => {
+          if (chatPartner && payload.new.sender_id === chatPartner.id) { addBubble(payload.new); markRead(); }
+        }).subscribe();
+    } catch (e) { /* polling covers this */ }
+    chatPoll = setInterval(() => { fetchMessages().catch(() => {}); }, 5000);
+    $('chatInput').focus();
+  }
+
+  function stopChat() {
+    if (chatPoll) { clearInterval(chatPoll); chatPoll = null; }
+    if (chatChannel) { try { client.removeChannel(chatChannel); } catch (e) {} chatChannel = null; }
+    chatPartner = null;
+  }
+
+  function closeChat() {
+    stopChat();
+    $('chatPanel').classList.add('hidden');
+    $('matchesPanel').classList.remove('hidden');
+    loadMatches();
+  }
+
+  $('chatBack').addEventListener('click', closeChat);
+
+  $('chatForm').addEventListener('submit', async event => {
+    event.preventDefault();
+    if (!chatPartner || !currentUser) return;
+    const input = $('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+    const btn = $('chatSend');
+    btn.disabled = true;
+    message('chatMsg', '');
+    try {
+      const { data, error } = await client.from('messages')
+        .insert({ sender_id: currentUser.id, receiver_id: chatPartner.id, content: text })
+        .select().single();
+      if (error) throw error;
+      input.value = '';
+      input.style.height = 'auto';
+      addBubble(data);
+    } catch (error) {
+      message('chatMsg', 'Could not send: ' + (error.message || 'Please try again.'), true);
+    } finally {
+      btn.disabled = false;
+      input.focus();
+    }
+  });
+
+  $('chatInput').addEventListener('keydown', event => {
+    if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); $('chatForm').requestSubmit(); }
+  });
+  $('chatInput').addEventListener('input', () => {
+    const el = $('chatInput');
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 110) + 'px';
+  });
+
   function setTab(tab) {
     $('discoverPanel').classList.toggle('hidden', tab !== 'discover');
     $('matchesPanel').classList.toggle('hidden', tab !== 'matches');
     $('myProfilePanel').classList.toggle('hidden', tab !== 'profile');
+    if (tab !== 'matches') stopChat();
+    $('chatPanel').classList.add('hidden');
     document.querySelectorAll('.tabs button').forEach(button => button.classList.toggle('active', button.dataset.tab === tab));
     if (tab === 'matches') loadMatches();
   }
@@ -466,6 +688,9 @@
       alert('Could not log out: ' + error.message);
       return;
     }
+    stopChat();
+    matchList = [];
+    unreadCounts = {};
     currentUser = null;
     profile = null;
     people = [];
