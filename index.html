@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-إعداد المحادثة (مرة واحدة): انسخ كود SQL أدناه إلى Supabase > SQL Editor > New query ثم اضغط Run.
+CHAT SETUP (one time): copy the SQL below into Supabase > SQL Editor > New query > Run.
 
 create table if not exists public.messages (
   id uuid primary key default gen_random_uuid(),
@@ -44,111 +44,122 @@ create policy "mark received as read" on public.messages
   with check (auth.uid() = receiver_id);
 
 alter publication supabase_realtime add table public.messages;
+alter publication supabase_realtime add table public.swipes;
 
 -->
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14060F">
 <meta name="mobile-web-app-capable" content="yes">
-<title>VOW – انسجام يقودك إلى شيء حقيقي</title>
+<title>VOW – chemistry that leads somewhere</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#14060f;--panel:#21101d;--panel2:#2b1726;--pink:#f06b9b;--rose:#ff9dbb;--cream:#fff4f5;--muted:#bdaab6;--line:#493044;--green:#8bd6ad}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#3b1730 0,#14060f 55%);color:var(--cream);font-family:"Segoe UI",Tahoma,"Noto Sans Arabic","Noto Naskh Arabic",system-ui,-apple-system,Arial,sans-serif;min-height:100vh}button,input,select,textarea{font:inherit}button{cursor:pointer}.shell{width:min(100%,520px);margin:auto;min-height:100vh;padding:22px 18px 100px}.brand{font-family:Georgia,serif;font-size:35px;letter-spacing:5px;text-align:center;margin:16px 0 4px}.tag{text-align:center;color:var(--muted);font-size:12px;letter-spacing:1.5px;margin-bottom:26px}.panel{background:linear-gradient(145deg,rgba(52,27,47,.96),rgba(31,13,27,.98));border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:0 18px 50px #0005}.eyebrow{color:var(--rose);font-size:11px;letter-spacing:2px;text-transform:uppercase}.heading{font:30px Georgia,serif;margin:9px 0}.sub{color:var(--muted);line-height:1.5;font-size:14px}.field{display:block;margin:15px 0}.field span{display:block;color:#e8cbd8;font-size:12px;margin:0 0 7px}.field input,.field select,.field textarea{width:100%;border:1px solid #56394d;background:#170a14;color:var(--cream);padding:13px 14px;border-radius:13px;outline:none}.field textarea{min-height:90px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--pink)}.btn{border:0;border-radius:14px;padding:14px 18px;background:linear-gradient(100deg,#e85d91,#b93e79);color:white;font-weight:700;width:100%;margin-top:8px}.btn.secondary{background:#382237;border:1px solid #634359}.btn:disabled{opacity:.5;cursor:wait}.switch{text-align:center;color:var(--muted);font-size:13px;margin-top:17px}.link{color:var(--rose);background:none;border:0;text-decoration:underline}.msg{margin-top:13px;color:var(--rose);font-size:13px;line-height:1.45}.hidden{display:none!important}.topline{display:flex;justify-content:space-between;align-items:center;margin:8px 0 20px}.smallbrand{font:24px Georgia,serif;letter-spacing:3px}.logout{background:none;color:var(--muted);border:1px solid var(--line);padding:8px 12px;border-radius:10px}.tabs{position:fixed;bottom:0;left:0;right:0;background:#180a15ed;backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;justify-content:center;gap:6px;padding:10px max(12px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom));z-index:5}.tabs button{width:min(31%,155px);background:transparent;border:0;color:var(--muted);padding:9px 4px;border-radius:12px;font-size:12px}.tabs button.active{background:#432238;color:#ffd6e5}.profile-card{margin-top:14px;padding:18px;border:1px solid var(--line);background:#281526;border-radius:20px}.avatar{width:68px;height:68px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#f48eaf,#713354);font:28px Georgia,serif;margin-bottom:12px}.chip{display:inline-block;border:1px solid #69445b;color:#f6d4e2;border-radius:30px;padding:6px 10px;font-size:11px;margin:4px 3px 0 0}.empty{text-align:center;padding:36px 12px;color:var(--muted)}.notice{font-size:11px;color:#bdaab6;line-height:1.5;margin-top:16px}.stepbar{height:4px;background:#45263b;border-radius:9px;margin:15px 0}.stepbar i{display:block;height:100%;background:var(--pink);border-radius:9px}.row{display:flex;gap:10px}.row>*{flex:1}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#3b1730 0,#14060f 55%);color:var(--cream);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}button,input,select,textarea{font:inherit}button{cursor:pointer}.shell{width:min(100%,520px);margin:auto;min-height:100vh;padding:22px 18px 100px}.brand{font-family:Georgia,serif;font-size:35px;letter-spacing:5px;text-align:center;margin:16px 0 4px}.tag{text-align:center;color:var(--muted);font-size:12px;letter-spacing:1.5px;margin-bottom:26px}.panel{background:linear-gradient(145deg,rgba(52,27,47,.96),rgba(31,13,27,.98));border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:0 18px 50px #0005}.eyebrow{color:var(--rose);font-size:11px;letter-spacing:2px;text-transform:uppercase}.heading{font:30px Georgia,serif;margin:9px 0}.sub{color:var(--muted);line-height:1.5;font-size:14px}.field{display:block;margin:15px 0}.field span{display:block;color:#e8cbd8;font-size:12px;margin:0 0 7px}.field input,.field select,.field textarea{width:100%;border:1px solid #56394d;background:#170a14;color:var(--cream);padding:13px 14px;border-radius:13px;outline:none}.field textarea{min-height:90px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--pink)}.btn{border:0;border-radius:14px;padding:14px 18px;background:linear-gradient(100deg,#e85d91,#b93e79);color:white;font-weight:700;width:100%;margin-top:8px}.btn.secondary{background:#382237;border:1px solid #634359}.btn:disabled{opacity:.5;cursor:wait}.switch{text-align:center;color:var(--muted);font-size:13px;margin-top:17px}.link{color:var(--rose);background:none;border:0;text-decoration:underline}.msg{margin-top:13px;color:var(--rose);font-size:13px;line-height:1.45}.hidden{display:none!important}.topline{display:flex;justify-content:space-between;align-items:center;margin:8px 0 20px}.smallbrand{font:24px Georgia,serif;letter-spacing:3px}.logout{background:none;color:var(--muted);border:1px solid var(--line);padding:8px 12px;border-radius:10px}.tabs{position:fixed;bottom:0;left:0;right:0;background:#180a15ed;backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;justify-content:center;gap:6px;padding:10px max(12px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom));z-index:5}.tabs button{width:min(31%,155px);background:transparent;border:0;color:var(--muted);padding:9px 4px;border-radius:12px;font-size:12px}.tabs button.active{background:#432238;color:#ffd6e5}.profile-card{margin-top:14px;padding:18px;border:1px solid var(--line);background:#281526;border-radius:20px}.avatar{width:68px;height:68px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#f48eaf,#713354);font:28px Georgia,serif;margin-bottom:12px}.chip{display:inline-block;border:1px solid #69445b;color:#f6d4e2;border-radius:30px;padding:6px 10px;font-size:11px;margin:4px 3px 0 0}.empty{text-align:center;padding:36px 12px;color:var(--muted)}.notice{font-size:11px;color:#bdaab6;line-height:1.5;margin-top:16px}.stepbar{height:4px;background:#45263b;border-radius:9px;margin:15px 0}.stepbar i{display:block;height:100%;background:var(--pink);border-radius:9px}.row{display:flex;gap:10px}.row>*{flex:1}
 .swipe-stage{position:relative;margin-top:18px;min-height:390px;touch-action:pan-y;user-select:none}.swipe-card{position:absolute;inset:0;background:linear-gradient(155deg,#382037,#21101d);border:1px solid #69445b;border-radius:22px;padding:22px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;box-shadow:0 15px 35px #0006;transition:transform .22s ease,opacity .22s ease;cursor:grab}.swipe-card:active{cursor:grabbing}.swipe-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 18%,rgba(240,107,155,.35),transparent 42%),linear-gradient(180deg,transparent 15%,rgba(12,4,11,.9) 100%);pointer-events:none}.swipe-card>*{position:relative;z-index:1}.sample-art{position:absolute!important;inset:0;display:grid;place-items:center;font:110px Georgia,serif;color:#ffd6e5;background:linear-gradient(135deg,#8b456c,#3b1b36);opacity:.72}.sample-art span{filter:drop-shadow(0 8px 15px #210b1c)}.swipe-card .eyebrow{margin-bottom:4px}.swipe-card h3{font:32px Georgia,serif;margin:5px 0}.swipe-card .sub{color:#f0dbe5}.swipe-stamp{position:absolute!important;top:28px;z-index:2;font-size:25px;font-weight:900;letter-spacing:3px;padding:7px 13px;border:4px solid;border-radius:10px;opacity:0}.swipe-stamp.like{left:20px;color:#8bd6ad;transform:rotate(-14deg)}.swipe-stamp.pass{right:20px;color:#ff9dbb;transform:rotate(14deg)}.swipe-actions{display:flex;justify-content:center;align-items:center;gap:24px;margin:18px 0 4px}.swipe-actions button{width:62px;height:62px;border-radius:50%;border:1px solid #69445b;background:#382237;color:#fff;font-size:27px;box-shadow:0 8px 22px #0004}.swipe-actions .like-btn{background:linear-gradient(135deg,#e85d91,#b93e79);border:0;font-size:30px}.swipe-actions button:active{transform:scale(.94)}.swipe-help{text-align:center;color:var(--muted);font-size:11px;margin-top:8px}
 
 .match-actions{display:flex;gap:10px;align-items:center;margin-top:12px}.match-actions .btn{margin-top:0;padding:11px 16px;width:auto;flex:1}.unread-dot{display:inline-block;min-width:20px;height:20px;border-radius:10px;background:var(--pink);color:#fff;font-size:11px;font-weight:700;line-height:20px;text-align:center;padding:0 6px;margin-left:6px}
 .chat-head{display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--line)}.chat-back{background:#382237;border:1px solid #634359;color:#fff;width:38px;height:38px;border-radius:12px;font-size:18px;flex:none}.chat-head .avatar{width:44px;height:44px;font-size:19px;margin:0;flex:none}.chat-head h2{font:21px Georgia,serif;margin:0}.chat-head .sub{font-size:12px;margin:2px 0 0}
 .chat-box{height:min(52vh,460px);overflow-y:auto;padding:16px 2px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth}.bubble{max-width:78%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.45;word-wrap:break-word;overflow-wrap:anywhere;white-space:pre-wrap}.bubble.me{align-self:flex-end;background:linear-gradient(100deg,#e85d91,#b93e79);border-bottom-right-radius:5px}.bubble.them{align-self:flex-start;background:#382237;border:1px solid #56394d;border-bottom-left-radius:5px}.bubble time{display:block;font-size:10px;opacity:.65;margin-top:4px;text-align:right}.chat-empty{margin:auto;text-align:center;color:var(--muted);font-size:13px;line-height:1.6;padding:20px}.chat-empty b{display:block;font:22px Georgia,serif;color:var(--cream);margin-bottom:6px}
 .chat-form{display:flex;gap:10px;align-items:flex-end;border-top:1px solid var(--line);padding-top:14px}.chat-form textarea{flex:1;border:1px solid #56394d;background:#170a14;color:var(--cream);padding:12px 14px;border-radius:16px;outline:none;resize:none;max-height:110px;min-height:46px;line-height:1.4}.chat-form textarea:focus{border-color:var(--pink)}.chat-form button{width:48px;height:46px;border:0;border-radius:50%;background:linear-gradient(135deg,#e85d91,#b93e79);color:#fff;font-size:19px;flex:none}.chat-form button:disabled{opacity:.5}
-.eyebrow,.tag,.swipe-stamp,.stepbar{letter-spacing:0!important;text-transform:none}.swipe-actions{direction:ltr}.bubble.me{align-self:flex-start!important}.bubble.them{align-self:flex-end!important}.bubble time{text-align:left}.field input[type=email],.field input[type=password]{direction:ltr;text-align:right}.field input[type=email]::placeholder,.field input[type=password]::placeholder{text-align:right}.heading,.swipe-card h3,.chat-head h2,.chat-empty b{font-family:"Noto Naskh Arabic","Segoe UI",Tahoma,Georgia,serif}
+.langbar{display:flex;justify-content:center;gap:6px;direction:ltr;margin:0 0 2px}.langbar button{background:#2b1726;border:1px solid var(--line);color:var(--muted);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700}.langbar button.active{background:linear-gradient(100deg,#e85d91,#b93e79);color:#fff;border-color:transparent}
+.swipe-actions{direction:ltr}.field input[type=email],.field input[type=password]{direction:ltr}.unread-dot{margin-left:0!important;margin-inline-start:6px}
+html[dir=rtl] body{font-family:"Segoe UI",Tahoma,"Noto Sans Arabic","Noto Naskh Arabic",system-ui,-apple-system,Arial,sans-serif}
+html[dir=rtl] .eyebrow,html[dir=rtl] .tag,html[dir=rtl] .swipe-stamp{letter-spacing:0!important;text-transform:none}
+html[dir=rtl] .heading,html[dir=rtl] .swipe-card h3,html[dir=rtl] .chat-head h2,html[dir=rtl] .chat-empty b{font-family:"Noto Naskh Arabic","Segoe UI",Tahoma,Georgia,serif}
+html[dir=rtl] .bubble.me{align-self:flex-start}html[dir=rtl] .bubble.them{align-self:flex-end}html[dir=rtl] .bubble time{text-align:left}
+html[dir=rtl] .field input[type=email],html[dir=rtl] .field input[type=password]{text-align:right}
+#toasts{position:fixed;top:max(12px,env(safe-area-inset-top));left:0;right:0;z-index:50;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}.toast{pointer-events:auto;width:min(92%,460px);background:linear-gradient(100deg,#e85d91,#b93e79);color:#fff;border-radius:16px;padding:12px 16px;box-shadow:0 12px 30px #0008;cursor:pointer;animation:toastIn .3s ease}.toast b{display:block;font-size:14px;margin-bottom:2px}.toast span{display:block;font-size:12px;opacity:.92;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}@keyframes toastIn{from{transform:translateY(-20px);opacity:0}to{transform:none;opacity:1}}.notif-banner{display:flex;gap:10px;align-items:center;justify-content:space-between;background:#2b1726;border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.5;color:#f0dbe5}.notif-banner button{background:linear-gradient(100deg,#e85d91,#b93e79);border:0;color:#fff;border-radius:10px;padding:8px 14px;font-weight:700;flex:none}
 </style>
 </head>
 <body>
 <main class="shell">
+  <div class="langbar" role="group" aria-label="Language"><button type="button" data-lang="en">EN</button><button type="button" data-lang="fr">FR</button><button type="button" data-lang="ar">عربي</button></div>
   <div class="brand">VOW</div>
-  <div class="tag">انسجام يقودك إلى مكان ما</div>
+  <div class="tag" data-i18n="tagline">CHEMISTRY THAT LEADS SOMEWHERE</div>
 
   <section id="authView" class="panel">
-    <div class="eyebrow">علاقة أكثر معنى</div>
-    <h1 class="heading" id="authHeading">ابحث عن شيء حقيقي.</h1>
-    <p class="sub" id="authSub">أنشئ حسابك وابدأ ببناء ملف شخصي يعكس حقيقتك.</p>
+    <div class="eyebrow" data-i18n="auth_eyebrow">A more meaningful connection</div>
+    <h1 class="heading" id="authHeading">Find something real.</h1>
+    <p class="sub" id="authSub">Create your account and start building a profile that reflects who you are.</p>
     <form id="authForm">
-      <label class="field"><span>البريد الإلكتروني</span><input id="email" type="email" autocomplete="email" placeholder="you@example.com" required></label>
-      <label class="field"><span>كلمة المرور</span><input id="password" type="password" autocomplete="current-password" minlength="6" placeholder="6 أحرف على الأقل" required></label>
+      <label class="field"><span data-i18n="label_email">Email address</span><input id="email" type="email" autocomplete="email" placeholder="you@example.com" required></label>
+      <label class="field"><span data-i18n="label_password">Password</span><input id="password" type="password" autocomplete="current-password" minlength="6" placeholder="At least 6 characters" data-i18n-ph="ph_password" required></label>
       <div id="signupFields">
-        <label class="field"><span>اسمك</span><input id="fullName" type="text" autocomplete="name" placeholder="اسمك"></label>
-        <label class="field"><span>عمرك</span><input id="age" type="number" min="18" max="100" placeholder="العمر"></label>
-        <label class="field"><span>أنا</span><select id="gender"><option value="">اختر</option><option value="Woman">امرأة</option><option value="Man">رجل</option><option value="Other">آخر</option></select></label>
+        <label class="field"><span data-i18n="label_yourname">Your name</span><input id="fullName" type="text" autocomplete="name" placeholder="Your name" data-i18n-ph="ph_yourname"></label>
+        <label class="field"><span data-i18n="label_yourage">Your age</span><input id="age" type="number" min="18" max="100" placeholder="Age" data-i18n-ph="ph_age"></label>
+        <label class="field"><span data-i18n="label_iam">I am</span><select id="gender"><option value="" data-i18n="opt_choose">Choose</option><option value="Woman" data-i18n="opt_woman_a">A woman</option><option value="Man" data-i18n="opt_man_a">A man</option><option value="Other" data-i18n="opt_other">Other</option></select></label>
       </div>
-      <button class="btn" id="authSubmit" type="submit">إنشاء حساب</button>
+      <button class="btn" id="authSubmit" type="submit">Create account</button>
     </form>
-    <div class="switch"><span id="switchText">لديك حساب بالفعل؟</span> <button class="link" id="switchMode" type="button">تسجيل الدخول</button></div>
+    <div class="switch"><span id="switchText">Already have an account?</span> <button class="link" id="switchMode" type="button">Log in</button></div>
     <div id="authMsg" class="msg" role="status"></div>
-    <p class="notice">VOW مخصص للبالغين من عمر 18 سنة فأكثر. تتم معالجة كلمة المرور بأمان عبر Supabase Authentication ولا يتم حفظها أبدًا في التخزين المحلي لهذه الصفحة.</p>
+    <p class="notice" data-i18n="auth_notice">VOW is for adults aged 18 and over. Your password is handled securely by Supabase Authentication; it is never saved in this page's local storage.</p>
   </section>
 
   <section id="appView" class="hidden">
-    <div class="topline"><div class="smallbrand">VOW</div><button class="logout" id="logoutBtn">تسجيل الخروج</button></div>
+    <div class="topline"><div class="smallbrand">VOW</div><button class="logout" id="logoutBtn" data-i18n="logout">Log out</button></div>
     <section id="setupView" class="panel hidden">
-      <div class="eyebrow">ملفك في VOW</div>
-      <h2 class="heading">دعهم يتعرفون عليك.</h2>
-      <p class="sub">أضف بعض التفاصيل ليفهم الآخرون ما يهمك.</p>
+      <div class="eyebrow" data-i18n="setup_eyebrow">Your VOW profile</div>
+      <h2 class="heading" data-i18n="setup_heading">Let them know you.</h2>
+      <p class="sub" data-i18n="setup_sub">Add a few details to help people understand what matters to you.</p>
       <div class="stepbar"><i style="width:100%"></i></div>
       <form id="profileForm">
-        <label class="field"><span>الاسم الكامل</span><input id="pName" required maxlength="70"></label>
+        <label class="field"><span data-i18n="label_fullname">Full name</span><input id="pName" required maxlength="70"></label>
         <div class="row">
-          <label class="field"><span>العمر</span><input id="pAge" type="number" min="18" max="100" required></label>
-          <label class="field"><span>الجنس</span><select id="pGender"><option value="">اختر</option><option value="Woman">امرأة</option><option value="Man">رجل</option><option value="Other">آخر</option></select></label>
+          <label class="field"><span data-i18n="label_age">Age</span><input id="pAge" type="number" min="18" max="100" required></label>
+          <label class="field"><span data-i18n="label_gender">Gender</span><select id="pGender"><option value="" data-i18n="opt_choose">Choose</option><option value="Woman" data-i18n="opt_woman">Woman</option><option value="Man" data-i18n="opt_man">Man</option><option value="Other" data-i18n="opt_other">Other</option></select></label>
         </div>
-        <label class="field"><span>البلد</span><input id="pCountry" maxlength="80" placeholder="البلد"></label>
-        <label class="field"><span>المدينة</span><input id="pCity" maxlength="80" placeholder="المدينة"></label>
-        <label class="field"><span>نبذة عني</span><textarea id="pBio" maxlength="500" placeholder="القليل عن شخصيتك واهتماماتك وقيمك..."></textarea></label>
-        <label class="field"><span>ما يهمني</span><input id="pValues" maxlength="200" placeholder="العائلة، الصدق، روح الدعابة..."></label>
-        <button class="btn" type="submit" id="saveProfile">حفظ ملفي</button>
+        <label class="field"><span data-i18n="label_country">Country</span><input id="pCountry" maxlength="80" placeholder="Country" data-i18n-ph="ph_country"></label>
+        <label class="field"><span data-i18n="label_city">City</span><input id="pCity" maxlength="80" placeholder="City" data-i18n-ph="ph_city"></label>
+        <label class="field"><span data-i18n="label_bio">About me</span><textarea id="pBio" maxlength="500" placeholder="A little about your personality, interests and values..." data-i18n-ph="ph_bio"></textarea></label>
+        <label class="field"><span data-i18n="label_values">What matters to me</span><input id="pValues" maxlength="200" placeholder="Family, honesty, humour..." data-i18n-ph="ph_values"></label>
+        <button class="btn" type="submit" id="saveProfile" data-i18n="btn_save">Save my profile</button>
       </form>
       <div id="profileMsg" class="msg"></div>
     </section>
 
     <section id="mainView">
+      <div id="notifBanner" class="notif-banner hidden"><span data-i18n="notif_banner">Turn on notifications to be alerted when you get a message or a new match.</span><button id="notifEnable" type="button" data-i18n="notif_enable">Enable</button></div>
       <div id="discoverPanel" class="panel">
-        <div class="eyebrow">اكتشف</div><h2 class="heading">تعرّف على شخص جديد.</h2>
-        <p class="sub">اكتشف أعضاء VOW الحقيقيين. اسحب لليمين للإعجاب أو لليسار للتخطي.</p>
-        <div id="peopleList"><div class="empty">جارٍ تحميل الملفات…</div></div>
+        <div class="eyebrow" data-i18n="disc_eyebrow">Discover</div><h2 class="heading" data-i18n="disc_heading">Meet someone new.</h2>
+        <p class="sub" data-i18n="disc_sub">Discover real VOW members. Swipe right to like or left to pass.</p>
+        <div id="peopleList"><div class="empty" data-i18n="loading_profiles">Loading profiles…</div></div>
         <div id="discoverMsg" class="msg"></div>
       </div>
       <div id="matchesPanel" class="panel hidden">
-        <div class="eyebrow">تواصلاتك</div><h2 class="heading">التطابقات</h2>
-        <div id="matchesList"><div class="empty">جارٍ تحميل تطابقاتك…</div></div>
-        <p class="notice">يظهر التطابق عندما يعجب كل شخص بالآخر. اضغط على «رسالة» لبدء المحادثة.</p>
+        <div class="eyebrow" data-i18n="match_eyebrow">Your connections</div><h2 class="heading" data-i18n="match_heading">Matches</h2>
+        <div id="matchesList"><div class="empty" data-i18n="loading_matches">Loading your matches…</div></div>
+        <p class="notice" data-i18n="matches_notice">A match appears when both people like each other. Tap Message to start chatting.</p>
       </div>
       <div id="chatPanel" class="panel hidden">
         <div class="chat-head">
-          <button class="chat-back" id="chatBack" type="button" aria-label="العودة إلى التطابقات">→</button>
+          <button class="chat-back" id="chatBack" type="button" data-i18n-aria="chat_back" aria-label="Back to matches">←</button>
           <div class="avatar" id="chatAvatar">V</div>
-          <div><h2 id="chatName">المحادثة</h2><p class="sub" id="chatSub"></p></div>
+          <div><h2 id="chatName">Chat</h2><p class="sub" id="chatSub"></p></div>
         </div>
         <div class="chat-box" id="chatBox" aria-live="polite"></div>
         <form class="chat-form" id="chatForm">
-          <textarea id="chatInput" rows="1" maxlength="1000" placeholder="اكتب رسالة…" aria-label="رسالة"></textarea>
-          <button type="submit" id="chatSend" aria-label="إرسال">➤</button>
+          <textarea id="chatInput" rows="1" maxlength="1000" placeholder="Write a message…" data-i18n-ph="ph_chat" data-i18n-aria="aria_message" aria-label="Message"></textarea>
+          <button type="submit" id="chatSend" data-i18n-aria="aria_send" aria-label="Send">➤</button>
         </form>
         <div id="chatMsg" class="msg"></div>
       </div>
       <div id="myProfilePanel" class="panel hidden">
-        <div class="eyebrow">حسابك</div><h2 class="heading">ملفي</h2>
+        <div class="eyebrow" data-i18n="prof_eyebrow">Your account</div><h2 class="heading" data-i18n="prof_heading">My profile</h2>
         <div id="myProfileContent"></div>
-        <button class="btn secondary" id="editProfileBtn">تعديل الملف</button>
+        <button class="btn secondary" id="editProfileBtn" data-i18n="btn_edit">Edit profile</button>
       </div>
     </section>
   </section>
 </main>
+<div id="toasts" aria-live="polite"></div>
 <nav id="tabs" class="tabs hidden">
-  <button class="active" data-tab="discover">♡ اكتشف</button>
-  <button data-tab="matches">✧ التطابقات</button>
-  <button data-tab="profile">◉ ملفي</button>
+  <button class="active" data-tab="discover">♡ <span data-i18n="tab_discover">Discover</span></button>
+  <button data-tab="matches">✧ <span data-i18n="tab_matches">Matches</span></button>
+  <button data-tab="profile">◉ <span data-i18n="tab_profile">Profile</span></button>
 </nav>
 <script>
 (() => {
@@ -158,6 +169,37 @@ alter publication supabase_realtime add table public.messages;
   const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
   const $ = id => document.getElementById(id);
+  const LANGS = {en:{dir:"ltr"}, fr:{dir:"ltr"}, ar:{dir:"rtl"}};
+  const I18N = {"en": {"doc_title": "VOW – chemistry that leads somewhere", "tagline": "CHEMISTRY THAT LEADS SOMEWHERE", "auth_eyebrow": "A more meaningful connection", "auth_heading_signup": "Find something real.", "auth_heading_login": "Welcome back.", "auth_sub_signup": "Create your account and start building a profile that reflects who you are.", "auth_sub_login": "Log in to continue your VOW journey.", "label_email": "Email address", "label_password": "Password", "ph_password": "At least 6 characters", "label_yourname": "Your name", "ph_yourname": "Your name", "label_yourage": "Your age", "ph_age": "Age", "label_iam": "I am", "opt_choose": "Choose", "opt_woman_a": "A woman", "opt_man_a": "A man", "opt_woman": "Woman", "opt_man": "Man", "opt_other": "Other", "btn_signup": "Create account", "btn_login": "Log in", "have_account": "Already have an account?", "new_to": "New to VOW?", "auth_notice": "VOW is for adults aged 18 and over. Your password is handled securely by Supabase Authentication; it is never saved in this page's local storage.", "logout": "Log out", "setup_eyebrow": "Your VOW profile", "setup_heading": "Let them know you.", "setup_sub": "Add a few details to help people understand what matters to you.", "label_fullname": "Full name", "label_age": "Age", "label_gender": "Gender", "label_country": "Country", "ph_country": "Country", "label_city": "City", "ph_city": "City", "label_bio": "About me", "ph_bio": "A little about your personality, interests and values...", "label_values": "What matters to me", "ph_values": "Family, honesty, humour...", "btn_save": "Save my profile", "disc_eyebrow": "Discover", "disc_heading": "Meet someone new.", "disc_sub": "Discover real VOW members. Swipe right to like or left to pass.", "loading_profiles": "Loading profiles…", "match_eyebrow": "Your connections", "match_heading": "Matches", "loading_matches": "Loading your matches…", "matches_notice": "A match appears when both people like each other. Tap Message to start chatting.", "chat_back": "Back to matches", "chat_title": "Chat", "ph_chat": "Write a message…", "aria_message": "Message", "aria_send": "Send", "prof_eyebrow": "Your account", "prof_heading": "My profile", "btn_edit": "Edit profile", "tab_discover": "Discover", "tab_matches": "Matches", "tab_profile": "Profile", "notif_banner": "Turn on notifications to be alerted when you get a message or a new match.", "notif_enable": "Enable", "creating": "Creating your account…", "logging": "Logging in…", "err_signup": "Please enter your name, a valid age (18+) and gender.", "signup_done": "Account created. Check your email and confirm your address, then return here to log in.", "err_generic": "Something went wrong. Please try again.", "err_profile_load": "You are logged in, but your profile could not be loaded: ", "saving": "Saving your profile…", "err_profile_fields": "Enter your name, age (18+) and gender.", "saved": "Profile saved successfully.", "err_save": "Could not save your profile.", "your_name_default": "Your name", "bio_default": "Add a short introduction about yourself.", "sep": ", ", "loading_real": "Loading real profiles…", "err_load_profiles": "Could not load profiles from the database.", "try_again": "Please try again.", "caught_up": "You are all caught up.", "no_new": "There are no new VOW profiles to show right now.", "refresh": "Refresh profiles", "member": "VOW member", "no_location": "Location not added", "no_bio": "This member has not added a bio yet.", "member_of": "VOW member · {i} of {n}", "aria_pass": "Pass", "aria_like": "Like", "stamp_like": "LIKE", "stamp_pass": "PASS", "swipe_help": "Swipe left to pass · Swipe right to like", "err_swipe": "Could not save your choice: ", "no_matches": "No matches yet. Keep discovering.", "no_mutual": "No mutual likes yet. When someone you liked likes you back, they will appear here.", "mutual_chip": "♡ Mutual match", "btn_message": "💬 Message", "err_matches": "Could not load matches.", "no_matches_show": "No matches to show.", "mutual_match": "Mutual match", "chat_welcome_title": "It's a match ♡", "chat_welcome": "Say hello to {name} and start the conversation.", "your_match": "your match", "loading_msgs": "Loading messages…", "err_msgs": "Could not load messages.", "chat_not_setup": "Chat is not set up yet. Run the messages SQL in Supabase first. (", "err_send": "Could not send: ", "err_logout": "Could not log out: ", "n_msg_one": "New message from {name}", "n_msg_many": "{n} new messages from {name}", "n_match": "🎉 New match with {name}!", "tap_chat": "Tap to start chatting", "matched_with": "🎉 You matched with {name}!", "new_matches": "🎉 New matches: {n}", "unread_msgs": "💬 Unread messages: {n}", "tap_view": "Tap to view your matches"}, "fr": {"doc_title": "VOW – une alchimie qui mène quelque part", "tagline": "UNE ALCHIMIE QUI MÈNE QUELQUE PART", "auth_eyebrow": "Une connexion plus profonde", "auth_heading_signup": "Trouvez quelque chose de vrai.", "auth_heading_login": "Bon retour parmi nous.", "auth_sub_signup": "Créez votre compte et commencez à construire un profil qui vous ressemble.", "auth_sub_login": "Connectez-vous pour continuer votre aventure VOW.", "label_email": "Adresse e-mail", "label_password": "Mot de passe", "ph_password": "Au moins 6 caractères", "label_yourname": "Votre nom", "ph_yourname": "Votre nom", "label_yourage": "Votre âge", "ph_age": "Âge", "label_iam": "Je suis", "opt_choose": "Choisir", "opt_woman_a": "Une femme", "opt_man_a": "Un homme", "opt_woman": "Femme", "opt_man": "Homme", "opt_other": "Autre", "btn_signup": "Créer un compte", "btn_login": "Se connecter", "have_account": "Vous avez déjà un compte ?", "new_to": "Nouveau sur VOW ?", "auth_notice": "VOW est réservé aux adultes de 18 ans et plus. Votre mot de passe est géré en toute sécurité par Supabase Authentication ; il n’est jamais enregistré dans le stockage local de cette page.", "logout": "Se déconnecter", "setup_eyebrow": "Votre profil VOW", "setup_heading": "Faites-vous connaître.", "setup_sub": "Ajoutez quelques détails pour aider les autres à comprendre ce qui compte pour vous.", "label_fullname": "Nom complet", "label_age": "Âge", "label_gender": "Genre", "label_country": "Pays", "ph_country": "Pays", "label_city": "Ville", "ph_city": "Ville", "label_bio": "À propos de moi", "ph_bio": "Quelques mots sur votre personnalité, vos centres d’intérêt et vos valeurs...", "label_values": "Ce qui compte pour moi", "ph_values": "Famille, honnêteté, humour...", "btn_save": "Enregistrer mon profil", "disc_eyebrow": "Découvrir", "disc_heading": "Rencontrez quelqu’un de nouveau.", "disc_sub": "Découvrez de vrais membres VOW. Glissez à droite pour aimer ou à gauche pour passer.", "loading_profiles": "Chargement des profils…", "match_eyebrow": "Vos connexions", "match_heading": "Matchs", "loading_matches": "Chargement de vos matchs…", "matches_notice": "Un match apparaît lorsque deux personnes se plaisent mutuellement. Touchez Message pour commencer à discuter.", "chat_back": "Retour aux matchs", "chat_title": "Discussion", "ph_chat": "Écrivez un message…", "aria_message": "Message", "aria_send": "Envoyer", "prof_eyebrow": "Votre compte", "prof_heading": "Mon profil", "btn_edit": "Modifier le profil", "tab_discover": "Découvrir", "tab_matches": "Matchs", "tab_profile": "Profil", "notif_banner": "Activez les notifications pour être alerté d’un nouveau message ou d’un nouveau match.", "notif_enable": "Activer", "creating": "Création de votre compte…", "logging": "Connexion…", "err_signup": "Veuillez saisir votre nom, un âge valide (18 ans et plus) et votre genre.", "signup_done": "Compte créé. Vérifiez votre e-mail et confirmez votre adresse, puis revenez ici pour vous connecter.", "err_generic": "Une erreur est survenue. Veuillez réessayer.", "err_profile_load": "Vous êtes connecté, mais votre profil n’a pas pu être chargé : ", "saving": "Enregistrement de votre profil…", "err_profile_fields": "Saisissez votre nom, votre âge (18 ans et plus) et votre genre.", "saved": "Profil enregistré avec succès.", "err_save": "Impossible d’enregistrer votre profil.", "your_name_default": "Votre nom", "bio_default": "Ajoutez une courte présentation de vous.", "sep": ", ", "loading_real": "Chargement des profils réels…", "err_load_profiles": "Impossible de charger les profils depuis la base de données.", "try_again": "Veuillez réessayer.", "caught_up": "Vous avez tout vu.", "no_new": "Il n’y a aucun nouveau profil VOW à afficher pour le moment.", "refresh": "Actualiser les profils", "member": "Membre VOW", "no_location": "Lieu non renseigné", "no_bio": "Ce membre n’a pas encore ajouté de bio.", "member_of": "Membre VOW · {i} sur {n}", "aria_pass": "Passer", "aria_like": "Aimer", "stamp_like": "J’AIME", "stamp_pass": "PASSER", "swipe_help": "Glissez à gauche pour passer · Glissez à droite pour aimer", "err_swipe": "Impossible d’enregistrer votre choix : ", "no_matches": "Pas encore de match. Continuez à explorer.", "no_mutual": "Aucun like mutuel pour l’instant. Quand une personne que vous avez aimée vous aime en retour, elle apparaîtra ici.", "mutual_chip": "♡ Match mutuel", "btn_message": "💬 Message", "err_matches": "Impossible de charger les matchs.", "no_matches_show": "Aucun match à afficher.", "mutual_match": "Match mutuel", "chat_welcome_title": "C’est un match ♡", "chat_welcome": "Dites bonjour à {name} et lancez la conversation.", "your_match": "votre match", "loading_msgs": "Chargement des messages…", "err_msgs": "Impossible de charger les messages.", "chat_not_setup": "La discussion n’est pas encore configurée. Exécutez d’abord le SQL des messages dans Supabase. (", "err_send": "Envoi impossible : ", "err_logout": "Impossible de se déconnecter : ", "n_msg_one": "Nouveau message de {name}", "n_msg_many": "{n} nouveaux messages de {name}", "n_match": "🎉 Nouveau match avec {name} !", "tap_chat": "Touchez pour discuter", "matched_with": "🎉 Vous avez matché avec {name} !", "new_matches": "🎉 Nouveaux matchs : {n}", "unread_msgs": "💬 Messages non lus : {n}", "tap_view": "Touchez pour voir vos matchs"}, "ar": {"doc_title": "VOW – انسجام يقودك إلى شيء حقيقي", "tagline": "انسجام يقودك إلى مكان ما", "auth_eyebrow": "علاقة أكثر معنى", "auth_heading_signup": "ابحث عن شيء حقيقي.", "auth_heading_login": "مرحبًا بعودتك.", "auth_sub_signup": "أنشئ حسابك وابدأ ببناء ملف شخصي يعكس حقيقتك.", "auth_sub_login": "سجّل الدخول لمتابعة رحلتك مع VOW.", "label_email": "البريد الإلكتروني", "label_password": "كلمة المرور", "ph_password": "6 أحرف على الأقل", "label_yourname": "اسمك", "ph_yourname": "اسمك", "label_yourage": "عمرك", "ph_age": "العمر", "label_iam": "أنا", "opt_choose": "اختر", "opt_woman_a": "امرأة", "opt_man_a": "رجل", "opt_woman": "امرأة", "opt_man": "رجل", "opt_other": "آخر", "btn_signup": "إنشاء حساب", "btn_login": "تسجيل الدخول", "have_account": "لديك حساب بالفعل؟", "new_to": "جديد في VOW؟", "auth_notice": "VOW مخصص للبالغين من عمر 18 سنة فأكثر. تتم معالجة كلمة المرور بأمان عبر Supabase Authentication ولا يتم حفظها أبدًا في التخزين المحلي لهذه الصفحة.", "logout": "تسجيل الخروج", "setup_eyebrow": "ملفك في VOW", "setup_heading": "دعهم يتعرفون عليك.", "setup_sub": "أضف بعض التفاصيل ليفهم الآخرون ما يهمك.", "label_fullname": "الاسم الكامل", "label_age": "العمر", "label_gender": "الجنس", "label_country": "البلد", "ph_country": "البلد", "label_city": "المدينة", "ph_city": "المدينة", "label_bio": "نبذة عني", "ph_bio": "القليل عن شخصيتك واهتماماتك وقيمك...", "label_values": "ما يهمني", "ph_values": "العائلة، الصدق، روح الدعابة...", "btn_save": "حفظ ملفي", "disc_eyebrow": "اكتشف", "disc_heading": "تعرّف على شخص جديد.", "disc_sub": "اكتشف أعضاء VOW الحقيقيين. اسحب لليمين للإعجاب أو لليسار للتخطي.", "loading_profiles": "جارٍ تحميل الملفات…", "match_eyebrow": "تواصلاتك", "match_heading": "التطابقات", "loading_matches": "جارٍ تحميل تطابقاتك…", "matches_notice": "يظهر التطابق عندما يعجب كل شخص بالآخر. اضغط على «رسالة» لبدء المحادثة.", "chat_back": "العودة إلى التطابقات", "chat_title": "المحادثة", "ph_chat": "اكتب رسالة…", "aria_message": "رسالة", "aria_send": "إرسال", "prof_eyebrow": "حسابك", "prof_heading": "ملفي", "btn_edit": "تعديل الملف", "tab_discover": "اكتشف", "tab_matches": "التطابقات", "tab_profile": "ملفي", "notif_banner": "فعّل الإشعارات ليصلك تنبيه عند وصول رسالة أو تطابق جديد.", "notif_enable": "تفعيل", "creating": "جارٍ إنشاء حسابك…", "logging": "جارٍ تسجيل الدخول…", "err_signup": "يرجى إدخال اسمك وعمر صالح (18 سنة فأكثر) وجنسك.", "signup_done": "تم إنشاء الحساب. تحقق من بريدك الإلكتروني وأكّد عنوانك، ثم عد إلى هنا لتسجيل الدخول.", "err_generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى.", "err_profile_load": "تم تسجيل دخولك، لكن تعذّر تحميل ملفك الشخصي: ", "saving": "جارٍ حفظ ملفك…", "err_profile_fields": "أدخل اسمك وعمرك (18 سنة فأكثر) وجنسك.", "saved": "تم حفظ الملف بنجاح.", "err_save": "تعذّر حفظ ملفك.", "your_name_default": "اسمك", "bio_default": "أضف نبذة قصيرة عن نفسك.", "sep": "، ", "loading_real": "جارٍ تحميل الملفات الحقيقية…", "err_load_profiles": "تعذّر تحميل الملفات من قاعدة البيانات.", "try_again": "يرجى المحاولة مرة أخرى.", "caught_up": "لقد شاهدت كل الملفات.", "no_new": "لا توجد ملفات جديدة في VOW لعرضها الآن.", "refresh": "تحديث الملفات", "member": "عضو VOW", "no_location": "لم يتم إضافة الموقع", "no_bio": "لم يضف هذا العضو نبذة بعد.", "member_of": "عضو VOW · {i} من {n}", "aria_pass": "تخطي", "aria_like": "إعجاب", "stamp_like": "أعجبني", "stamp_pass": "تخطي", "swipe_help": "اسحب لليسار للتخطي · اسحب لليمين للإعجاب", "err_swipe": "تعذّر حفظ اختيارك: ", "no_matches": "لا توجد تطابقات بعد. واصل الاكتشاف.", "no_mutual": "لا توجد إعجابات متبادلة بعد. عندما يبادلك شخص أعجبتَ به الإعجاب سيظهر هنا.", "mutual_chip": "♡ تطابق متبادل", "btn_message": "💬 رسالة", "err_matches": "تعذّر تحميل التطابقات.", "no_matches_show": "لا توجد تطابقات لعرضها.", "mutual_match": "تطابق متبادل", "chat_welcome_title": "لقد تطابقتما ♡", "chat_welcome": "قل مرحبًا لـ {name} وابدأ المحادثة.", "your_match": "تطابقك", "loading_msgs": "جارٍ تحميل الرسائل…", "err_msgs": "تعذّر تحميل الرسائل.", "chat_not_setup": "المحادثة غير مُعدّة بعد. شغّل كود SQL الخاص بالرسائل في Supabase أولًا. (", "err_send": "تعذّر الإرسال: ", "err_logout": "تعذّر تسجيل الخروج: ", "n_msg_one": "رسالة جديدة من {name}", "n_msg_many": "{n} رسائل جديدة من {name}", "n_match": "🎉 تطابق جديد مع {name}!", "tap_chat": "اضغط لبدء المحادثة", "matched_with": "🎉 تطابقتما مع {name}!", "new_matches": "🎉 تطابقات جديدة: {n}", "unread_msgs": "💬 رسائل غير مقروءة: {n}", "tap_view": "اضغط لعرض التطابقات"}};
+  let lang = 'en';
+  try { const saved = localStorage.getItem('vow_lang'); if (saved && LANGS[saved]) lang = saved; } catch (e) {}
+  function t(key, vars) {
+    let str = I18N[lang] && I18N[lang][key];
+    if (str == null) str = I18N.en[key];
+    if (str == null) str = key;
+    if (vars) Object.keys(vars).forEach(k => { str = str.split('{' + k + '}').join(vars[k]); });
+    return str;
+  }
+  function applyLang() {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = LANGS[lang].dir;
+    document.title = t('doc_title');
+    document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+    document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+    document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+    document.querySelectorAll('.langbar button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+    $('chatBack').textContent = LANGS[lang].dir === 'rtl' ? '→' : '←';
+    renderAuthTexts();
+    if (profile) renderProfile();
+    if (currentUser && peopleLoaded && !busySwipe) renderPerson();
+    if (currentUser && !$('matchesPanel').classList.contains('hidden')) loadMatches();
+    updateBadge();
+  }
+  document.querySelectorAll('.langbar button').forEach(b => b.addEventListener('click', () => {
+    lang = b.dataset.lang;
+    try { localStorage.setItem('vow_lang', lang); } catch (e) {}
+    applyLang();
+  }));
   let isSignup = true;
   let currentUser = null;
   let profile = null;
@@ -166,12 +208,22 @@ alter publication supabase_realtime add table public.messages;
   let swipeStartX = 0;
   let activeCard = null;
   let busySwipe = false;
+  let peopleLoaded = false;
   let matchList = [];
   let chatPartner = null;
   let chatPoll = null;
   let chatChannel = null;
   let chatSeen = new Set();
   let unreadCounts = {};
+  let unreadList = [];
+  let knownMatchIds = new Set();
+  let notifiedMsgIds = new Set();
+  let newMatchCount = 0;
+  let notifyMsgChannel = null;
+  let notifySwipeChannel = null;
+  let notifyPoll = null;
+  let notifyStarted = false;
+  let nameCache = {};
 
   function message(id, text, error = false) {
     const el = $(id);
@@ -191,14 +243,19 @@ alter publication supabase_realtime add table public.messages;
     $('tabs').classList.remove('hidden');
   }
 
+  function renderAuthTexts() {
+    const signup = isSignup;
+    $('authHeading').textContent = t(signup ? 'auth_heading_signup' : 'auth_heading_login');
+    $('authSub').textContent = t(signup ? 'auth_sub_signup' : 'auth_sub_login');
+    $('authSubmit').textContent = t(signup ? 'btn_signup' : 'btn_login');
+    $('switchText').textContent = t(signup ? 'have_account' : 'new_to');
+    $('switchMode').textContent = t(signup ? 'btn_login' : 'btn_signup');
+  }
+
   function setAuthMode(signup) {
     isSignup = signup;
     $('signupFields').classList.toggle('hidden', !signup);
-    $('authHeading').textContent = signup ? 'ابحث عن شيء حقيقي.' : 'مرحبًا بعودتك.';
-    $('authSub').textContent = signup ? 'أنشئ حسابك وابدأ ببناء ملف شخصي يعكس حقيقتك.' : 'سجّل الدخول لمتابعة رحلتك مع VOW.';
-    $('authSubmit').textContent = signup ? 'إنشاء حساب' : 'تسجيل الدخول';
-    $('switchText').textContent = signup ? 'لديك حساب بالفعل؟' : 'جديد في VOW؟';
-    $('switchMode').textContent = signup ? 'تسجيل الدخول' : 'إنشاء حساب';
+    renderAuthTexts();
     $('password').autocomplete = signup ? 'new-password' : 'current-password';
     message('authMsg', '');
   }
@@ -211,14 +268,14 @@ alter publication supabase_realtime add table public.messages;
     const password = $('password').value;
     const button = $('authSubmit');
     button.disabled = true;
-    message('authMsg', isSignup ? 'جارٍ إنشاء حسابك…' : 'جارٍ تسجيل الدخول…');
+    message('authMsg', t(isSignup ? 'creating' : 'logging'));
     try {
       if (isSignup) {
         const name = $('fullName').value.trim();
         const age = Number($('age').value);
         const gender = $('gender').value;
         if (!name || !age || age < 18 || age > 100 || !gender) {
-          throw new Error('يرجى إدخال اسمك وعمر صالح (18 سنة فأكثر) وجنسك.');
+          throw new Error(t('err_signup'));
         }
         const { data, error } = await client.auth.signUp({
           email, password,
@@ -226,7 +283,7 @@ alter publication supabase_realtime add table public.messages;
         });
         if (error) throw error;
         if (!data.session) {
-          message('authMsg', 'تم إنشاء الحساب. تحقق من بريدك الإلكتروني وأكّد عنوانك، ثم عد إلى هنا لتسجيل الدخول.');
+          message('authMsg', t('signup_done'));
           return;
         }
         await enterApp(data.user);
@@ -236,7 +293,7 @@ alter publication supabase_realtime add table public.messages;
         await enterApp(data.user);
       }
     } catch (error) {
-      message('authMsg', error.message || 'حدث خطأ ما. يرجى المحاولة مرة أخرى.', true);
+      message('authMsg', error.message || t('err_generic'), true);
     } finally {
       button.disabled = false;
     }
@@ -273,10 +330,11 @@ alter publication supabase_realtime add table public.messages;
         setTab('discover');
         await loadDiscover();
         await loadMatches();
+        startNotifications();
       }
     } catch (error) {
       showAuth();
-      message('authMsg', 'تم تسجيل دخولك، لكن تعذّر تحميل ملفك الشخصي: ' + error.message, true);
+      message('authMsg', t('err_profile_load') + error.message, true);
     }
   }
 
@@ -296,7 +354,7 @@ alter publication supabase_realtime add table public.messages;
     if (!currentUser) return;
     const button = $('saveProfile');
     button.disabled = true;
-    message('profileMsg', 'جارٍ حفظ ملفك…');
+    message('profileMsg', t('saving'));
     const values = {
       full_name: $('pName').value.trim(),
       age: Number($('pAge').value),
@@ -308,7 +366,7 @@ alter publication supabase_realtime add table public.messages;
     };
     try {
       if (!values.full_name || values.age < 18 || values.age > 100 || !values.gender) {
-        throw new Error('أدخل اسمك وعمرك (18 سنة فأكثر) وجنسك.');
+        throw new Error(t('err_profile_fields'));
       }
       const { data, error } = await client.from('profiles')
         .upsert({ id: currentUser.id, ...values }, { onConflict: 'id' })
@@ -321,9 +379,10 @@ alter publication supabase_realtime add table public.messages;
       setTab('discover');
       await loadDiscover();
       await loadMatches();
-      message('profileMsg', 'تم حفظ الملف بنجاح.');
+      startNotifications();
+      message('profileMsg', t('saved'));
     } catch (error) {
-      message('profileMsg', error.message || 'تعذّر حفظ ملفك.', true);
+      message('profileMsg', error.message || t('err_save'), true);
     } finally {
       button.disabled = false;
     }
@@ -335,21 +394,21 @@ alter publication supabase_realtime add table public.messages;
 
   function renderProfile() {
     const p = profile || {};
-    const name = escapeHTML(p.full_name || 'اسمك');
+    const name = escapeHTML(p.full_name || t('your_name_default'));
     const initials = name.trim().charAt(0).toUpperCase() || 'V';
     const values = escapeHTML(p.profile_data?.values || '');
     $('myProfileContent').innerHTML = `
       <div class="profile-card"><div class="avatar">${initials}</div>
-      <h2 class="heading">${name}${p.age ? '، ' + Number(p.age) : ''}</h2>
-      <p class="sub">${escapeHTML([p.city,p.country].filter(Boolean).join(', '))}</p>
-      <p>${escapeHTML(p.bio || 'أضف نبذة قصيرة عن نفسك.')}</p>
+      <h2 class="heading">${name}${p.age ? t('sep') + Number(p.age) : ''}</h2>
+      <p class="sub">${escapeHTML([p.city,p.country].filter(Boolean).join(t('sep')))}</p>
+      <p>${escapeHTML(p.bio || t('bio_default'))}</p>
       ${values ? `<span class="chip">${values}</span>` : ''}
       <p class="notice">${escapeHTML(currentUser?.email || '')}</p></div>`;
   }
 
   async function loadDiscover() {
     const list = $('peopleList');
-    list.innerHTML = '<div class="empty">جارٍ تحميل الملفات الحقيقية…</div>';
+    list.innerHTML = `<div class="empty">${t('loading_real')}</div>`;
     message('discoverMsg', '');
     try {
       const [{ data: allProfiles, error: profileError }, { data: mySwipes, error: swipeError }] = await Promise.all([
@@ -364,45 +423,46 @@ alter publication supabase_realtime add table public.messages;
         person.full_name && Number(person.age) >= 18 && person.gender
       );
       personIndex = 0;
+      peopleLoaded = true;
       renderPerson();
     } catch (error) {
-      list.innerHTML = '<div class="empty">تعذّر تحميل الملفات من قاعدة البيانات.</div>';
-      message('discoverMsg', error.message || 'يرجى المحاولة مرة أخرى.', true);
+      list.innerHTML = `<div class="empty">${t('err_load_profiles')}</div>`;
+      message('discoverMsg', error.message || t('try_again'), true);
     }
   }
 
   function renderPerson() {
     const list = $('peopleList');
     if (personIndex >= people.length) {
-      list.innerHTML = `<div class="empty"><div style="font-size:38px;margin-bottom:10px">♡</div><h3 class="heading">لقد شاهدت كل الملفات.</h3><p class="sub">لا توجد ملفات جديدة في VOW لعرضها الآن.</p><button class="btn secondary" id="refreshPeople">تحديث الملفات</button></div>`;
+      list.innerHTML = `<div class="empty"><div style="font-size:38px;margin-bottom:10px">♡</div><h3 class="heading">${t('caught_up')}</h3><p class="sub">${t('no_new')}</p><button class="btn secondary" id="refreshPeople">${t('refresh')}</button></div>`;
       $('refreshPeople').addEventListener('click', loadDiscover);
       return;
     }
     const person = people[personIndex];
     const initial = escapeHTML((person.full_name || 'V').trim().charAt(0).toUpperCase());
-    const name = escapeHTML(person.full_name || 'عضو VOW');
+    const name = escapeHTML(person.full_name || t('member'));
     const age = Number(person.age);
-    const location = escapeHTML([person.city, person.country].filter(Boolean).join(', ') || 'لم يتم إضافة الموقع');
-    const bio = escapeHTML(person.bio || 'لم يضف هذا العضو نبذة بعد.');
+    const location = escapeHTML([person.city, person.country].filter(Boolean).join(t('sep')) || t('no_location'));
+    const bio = escapeHTML(person.bio || t('no_bio'));
     const values = escapeHTML(person.profile_data?.values || '');
     list.innerHTML = `
       <div class="swipe-stage" id="swipeStage">
         <article class="swipe-card" id="swipeCard">
           <div class="sample-art"><span>${initial}</span></div>
-          <div class="swipe-stamp like" id="likeStamp">أعجبني</div>
-          <div class="swipe-stamp pass" id="passStamp">تخطي</div>
-          <div class="eyebrow">عضو VOW · ${personIndex + 1} من ${people.length}</div>
-          <h3>${name}، ${age}</h3>
+          <div class="swipe-stamp like" id="likeStamp">${t('stamp_like')}</div>
+          <div class="swipe-stamp pass" id="passStamp">${t('stamp_pass')}</div>
+          <div class="eyebrow">${t('member_of', {i: personIndex + 1, n: people.length})}</div>
+          <h3>${name}${t('sep')}${age}</h3>
           <p class="sub">${location}</p>
           <p>${bio}</p>
           ${values ? `<span class="chip">${values}</span>` : ''}
         </article>
       </div>
       <div class="swipe-actions">
-        <button type="button" id="passButton" aria-label="تخطي">✕</button>
-        <button type="button" class="like-btn" id="likeButton" aria-label="إعجاب">♥</button>
+        <button type="button" id="passButton" aria-label="${t('aria_pass')}">✕</button>
+        <button type="button" class="like-btn" id="likeButton" aria-label="${t('aria_like')}">♥</button>
       </div>
-      <p class="swipe-help">اسحب لليسار للتخطي · اسحب لليمين للإعجاب</p>`;
+      <p class="swipe-help">${t('swipe_help')}</p>`;
     bindSwipe();
   }
 
@@ -429,13 +489,13 @@ alter publication supabase_realtime add table public.messages;
       personIndex++;
       busySwipe = false;
       renderPerson();
-      if (direction === 'like') await loadMatches();
+      if (direction === 'like') { checkMutual(person); await loadMatches(); }
     } catch (error) {
       busySwipe = false;
       if (card) { card.style.transform = ''; card.style.opacity = '1'; }
       passButton.disabled = false;
       likeButton.disabled = false;
-      message('discoverMsg', 'تعذّر حفظ اختيارك: ' + (error.message || 'يرجى المحاولة مرة أخرى.'), true);
+      message('discoverMsg', t('err_swipe') + (error.message || t('try_again')), true);
     }
   }
 
@@ -481,14 +541,14 @@ alter publication supabase_realtime add table public.messages;
   async function loadMatches() {
     const list = $('matchesList');
     if (!list || !currentUser) return;
-    list.innerHTML = '<div class="empty">جارٍ تحميل تطابقاتك…</div>';
+    list.innerHTML = `<div class="empty">${t('loading_matches')}</div>`;
     try {
       const { data: incoming, error: incomingError } = await client.from('swipes')
         .select('user_id').eq('target_user_id', currentUser.id).eq('action', 'like');
       if (incomingError) throw incomingError;
       const incomingIds = [...new Set((incoming || []).map(item => item.user_id).filter(id => id !== currentUser.id))];
       if (!incomingIds.length) {
-        list.innerHTML = '<div class="empty">لا توجد تطابقات بعد. واصل الاكتشاف.</div>';
+        list.innerHTML = `<div class="empty">${t('no_matches')}</div>`;
         return;
       }
       const { data: outgoing, error: outgoingError } = await client.from('swipes')
@@ -496,7 +556,7 @@ alter publication supabase_realtime add table public.messages;
       if (outgoingError) throw outgoingError;
       const matchIds = (outgoing || []).map(item => item.target_user_id);
       if (!matchIds.length) {
-        list.innerHTML = '<div class="empty">لا توجد إعجابات متبادلة بعد. عندما يبادلك شخص أعجبتَ به الإعجاب سيظهر هنا.</div>';
+        list.innerHTML = `<div class="empty">${t('no_mutual')}</div>`;
         return;
       }
       const { data: matchedProfiles, error: matchedError } = await client.from('profiles')
@@ -506,16 +566,16 @@ alter publication supabase_realtime add table public.messages;
       await loadUnread();
       list.innerHTML = (matchedProfiles || []).map(person => `
         <div class="profile-card"><div class="avatar">${escapeHTML((person.full_name || 'V').trim().charAt(0).toUpperCase())}</div>
-        <h3 class="heading">${escapeHTML(person.full_name || 'عضو VOW')}${person.age ? '، ' + Number(person.age) : ''}</h3>
-        <p class="sub">${escapeHTML([person.city, person.country].filter(Boolean).join(', '))}</p>
-        <span class="chip">♡ تطابق متبادل</span>
-        <div class="match-actions"><button class="btn" type="button" data-chat="${escapeHTML(person.id)}">💬 رسالة${unreadCounts[person.id] ? `<span class="unread-dot">${unreadCounts[person.id]}</span>` : ''}</button></div></div>`).join('') || '<div class="empty">لا توجد تطابقات لعرضها.</div>';
+        <h3 class="heading">${escapeHTML(person.full_name || t('member'))}${person.age ? t('sep') + Number(person.age) : ''}</h3>
+        <p class="sub">${escapeHTML([person.city, person.country].filter(Boolean).join(t('sep')))}</p>
+        <span class="chip">${t('mutual_chip')}</span>
+        <div class="match-actions"><button class="btn" type="button" data-chat="${escapeHTML(person.id)}">${t('btn_message')}${unreadCounts[person.id] ? `<span class="unread-dot">${unreadCounts[person.id]}</span>` : ''}</button></div></div>`).join('') || `<div class="empty">${t('no_matches_show')}</div>`;
       list.querySelectorAll('[data-chat]').forEach(btn => btn.addEventListener('click', () => {
         const person = matchList.find(item => item.id === btn.dataset.chat);
         if (person) openChat(person);
       }));
     } catch (error) {
-      list.innerHTML = '<div class="empty">تعذّر تحميل التطابقات.</div>';
+      list.innerHTML = `<div class="empty">${t('err_matches')}</div>`;
       console.error('VOW matches error:', error);
     }
   }
@@ -525,17 +585,19 @@ alter publication supabase_realtime add table public.messages;
     const d = new Date(iso);
     if (isNaN(d)) return '';
     const sameDay = d.toDateString() === new Date().toDateString();
-    return sameDay ? d.toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit'})
-      : d.toLocaleDateString('ar', {day:'numeric', month:'short'}) + ' ' + d.toLocaleTimeString('ar', {hour:'2-digit', minute:'2-digit'});
+    return sameDay ? d.toLocaleTimeString(lang, {hour:'2-digit', minute:'2-digit'})
+      : d.toLocaleDateString(lang, {day:'numeric', month:'short'}) + ' ' + d.toLocaleTimeString(lang, {hour:'2-digit', minute:'2-digit'});
   }
 
   async function loadUnread() {
     try {
-      const { data, error } = await client.from('messages').select('sender_id').eq('receiver_id', currentUser.id).is('read_at', null);
+      const { data, error } = await client.from('messages').select('id,sender_id,content').eq('receiver_id', currentUser.id).is('read_at', null);
       if (error) throw error;
       unreadCounts = {};
-      (data || []).forEach(m => { unreadCounts[m.sender_id] = (unreadCounts[m.sender_id] || 0) + 1; });
-    } catch (e) { unreadCounts = {}; }
+      unreadList = data || [];
+      unreadList.forEach(m => { unreadCounts[m.sender_id] = (unreadCounts[m.sender_id] || 0) + 1; });
+    } catch (e) { unreadCounts = {}; unreadList = []; }
+    updateBadge();
   }
 
   function addBubble(m) {
@@ -562,6 +624,7 @@ alter publication supabase_realtime add table public.messages;
       await client.from('messages').update({ read_at: new Date().toISOString() })
         .eq('sender_id', chatPartner.id).eq('receiver_id', currentUser.id).is('read_at', null);
       delete unreadCounts[chatPartner.id];
+      updateBadge();
     } catch (e) { /* non-critical */ }
   }
 
@@ -573,7 +636,7 @@ alter publication supabase_realtime add table public.messages;
       .order('created_at', { ascending: true }).limit(300);
     if (error) throw error;
     if (initial && !(data || []).length) {
-      $('chatBox').innerHTML = `<div class="chat-empty"><b>لقد تطابقتما ♡</b>قل مرحبًا لـ ${escapeHTML(chatPartner.full_name || 'تطابقك')} وابدأ المحادثة.</div>`;
+      $('chatBox').innerHTML = `<div class="chat-empty"><b>${t('chat_welcome_title')}</b>${t('chat_welcome', {name: escapeHTML(chatPartner.full_name || t('your_match'))})}</div>`;
     }
     (data || []).forEach(addBubble);
     if ((data || []).some(m => m.sender_id === other && !m.read_at)) markRead();
@@ -586,17 +649,17 @@ alter publication supabase_realtime add table public.messages;
     $('matchesPanel').classList.add('hidden');
     $('chatPanel').classList.remove('hidden');
     $('chatAvatar').textContent = (person.full_name || 'V').trim().charAt(0).toUpperCase();
-    $('chatName').textContent = person.full_name || 'عضو VOW';
-    $('chatSub').textContent = [person.city, person.country].filter(Boolean).join(', ') || 'تطابق متبادل';
-    $('chatBox').innerHTML = '<div class="chat-empty">جارٍ تحميل الرسائل…</div>';
+    $('chatName').textContent = person.full_name || t('member');
+    $('chatSub').textContent = [person.city, person.country].filter(Boolean).join(t('sep')) || t('mutual_match');
+    $('chatBox').innerHTML = `<div class="chat-empty">${t('loading_msgs')}</div>`;
     message('chatMsg', '');
     window.scrollTo({ top: 0, behavior: 'smooth' });
     try {
       await fetchMessages(true);
       $('chatBox').scrollTop = $('chatBox').scrollHeight;
     } catch (error) {
-      $('chatBox').innerHTML = '<div class="chat-empty">تعذّر تحميل الرسائل.</div>';
-      message('chatMsg', 'المحادثة غير مُعدّة بعد. شغّل كود SQL الخاص بالرسائل في Supabase أولًا. (' + (error.message || '') + ')', true);
+      $('chatBox').innerHTML = `<div class="chat-empty">${t('err_msgs')}</div>`;
+      message('chatMsg', t('chat_not_setup') + (error.message || '') + ')', true);
       return;
     }
     try {
@@ -642,7 +705,7 @@ alter publication supabase_realtime add table public.messages;
       input.style.height = 'auto';
       addBubble(data);
     } catch (error) {
-      message('chatMsg', 'تعذّر الإرسال: ' + (error.message || 'يرجى المحاولة مرة أخرى.'), true);
+      message('chatMsg', t('err_send') + (error.message || t('try_again')), true);
     } finally {
       btn.disabled = false;
       input.focus();
@@ -658,6 +721,212 @@ alter publication supabase_realtime add table public.messages;
     el.style.height = Math.min(el.scrollHeight, 110) + 'px';
   });
 
+  // ---------- NOTIFICATIONS ----------
+  let audioCtx = null;
+  function lsGet(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function seenKey() { return 'vow_seen_matches_' + (currentUser ? currentUser.id : ''); }
+  function saveSeen() { if (currentUser) lsSet(seenKey(), [...knownMatchIds]); }
+
+  function updateBadge() {
+    const unread = Object.entries(unreadCounts).reduce((sum, [id, n]) => sum + (chatPartner && chatPartner.id === id ? 0 : n), 0);
+    const total = unread + newMatchCount;
+    const btn = document.querySelector('.tabs button[data-tab="matches"]');
+    if (btn) btn.innerHTML = '✧ ' + escapeHTML(t('tab_matches')) + (total ? `<span class="unread-dot">${total}</span>` : '');
+    document.title = (total ? `(${total}) ` : '') + t('doc_title');
+  }
+
+  function beep() {
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain(), now = audioCtx.currentTime;
+      o.type = 'sine'; o.frequency.value = 880;
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(0.15, now + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(now); o.stop(now + 0.4);
+    } catch (e) {}
+  }
+
+  function toast(title, body, onClick) {
+    const box = $('toasts');
+    if (!box) return;
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.setAttribute('role', 'status');
+    const b = document.createElement('b');
+    b.textContent = title;
+    el.appendChild(b);
+    if (body) { const sp = document.createElement('span'); sp.textContent = body; el.appendChild(sp); }
+    const remove = () => { if (el.parentNode) el.remove(); };
+    el.addEventListener('click', () => { remove(); if (onClick) onClick(); });
+    box.appendChild(el);
+    setTimeout(remove, 7000);
+    while (box.children.length > 3) box.firstChild.remove();
+  }
+
+  function browserNotify(title, body) {
+    try {
+      if ('Notification' in window && Notification.permission === 'granted' && document.hidden) {
+        const n = new Notification(title, { body, tag: 'vow' });
+        n.onclick = () => { window.focus(); n.close(); };
+      }
+    } catch (e) {}
+  }
+
+  function alertUser(title, body, onClick) { toast(title, body, onClick); browserNotify(title, body); beep(); }
+
+  async function personById(id) {
+    const cached = matchList.find(x => x.id === id) || nameCache[id];
+    if (cached) return cached;
+    try {
+      const { data } = await client.from('profiles').select('id,full_name,age,city,country,bio').eq('id', id).maybeSingle();
+      if (data) { nameCache[id] = data; return data; }
+    } catch (e) {}
+    return { id, full_name: t('member') };
+  }
+
+  async function goToChat(person) { setTab('matches'); await openChat(person); }
+
+  async function announceMessage(senderId, count, preview) {
+    const p = await personById(senderId);
+    const name = p.full_name || t('member');
+    alertUser(count > 1 ? t('n_msg_many', { n: count, name }) : t('n_msg_one', { name }), count > 1 ? '' : String(preview || '').slice(0, 80), () => goToChat(p));
+  }
+
+  async function announceMatch(id) {
+    const p = await personById(id);
+    alertUser(t('n_match', { name: p.full_name || t('member') }), t('tap_chat'), () => goToChat(p));
+    if (!$('matchesPanel').classList.contains('hidden')) loadMatches();
+  }
+
+  function registerNewMatch(id) {
+    knownMatchIds.add(id);
+    const viewing = !$('matchesPanel').classList.contains('hidden');
+    if (viewing) saveSeen(); else newMatchCount++;
+    updateBadge();
+    announceMatch(id);
+  }
+
+  async function computeMatchIds() {
+    const { data: inc, error: e1 } = await client.from('swipes').select('user_id').eq('target_user_id', currentUser.id).eq('action', 'like');
+    if (e1) throw e1;
+    const ids = [...new Set((inc || []).map(i => i.user_id).filter(i => i !== currentUser.id))];
+    if (!ids.length) return [];
+    const { data: out, error: e2 } = await client.from('swipes').select('target_user_id').eq('user_id', currentUser.id).eq('action', 'like').in('target_user_id', ids);
+    if (e2) throw e2;
+    return (out || []).map(i => i.target_user_id);
+  }
+
+  // I just liked someone: tell me right away if it is mutual
+  async function checkMutual(person) {
+    try {
+      const { data, error } = await client.from('swipes').select('user_id')
+        .eq('user_id', person.id).eq('target_user_id', currentUser.id).eq('action', 'like').maybeSingle();
+      if (error || !data || knownMatchIds.has(person.id)) return;
+      knownMatchIds.add(person.id);
+      nameCache[person.id] = person;
+      saveSeen();
+      alertUser(t('matched_with', { name: person.full_name || t('member') }), t('tap_chat'), () => goToChat(person));
+    } catch (e) {}
+  }
+
+  // Someone liked me: if I liked them too, it is a match
+  async function onIncomingLike(row) {
+    if (!row || row.action !== 'like' || row.user_id === currentUser.id) return;
+    try {
+      const { data } = await client.from('swipes').select('target_user_id')
+        .eq('user_id', currentUser.id).eq('target_user_id', row.user_id).eq('action', 'like').maybeSingle();
+      if (data && !knownMatchIds.has(row.user_id)) registerNewMatch(row.user_id);
+    } catch (e) {}
+  }
+
+  function onNewMessage(row) {
+    if (!row || notifiedMsgIds.has(row.id)) return;
+    notifiedMsgIds.add(row.id);
+    if (chatPartner && chatPartner.id === row.sender_id) {
+      if (document.hidden) {
+        personById(row.sender_id).then(p => { browserNotify(t('n_msg_one', { name: p.full_name || t('member') }), String(row.content || '').slice(0, 80)); beep(); });
+      }
+      return;
+    }
+    unreadCounts[row.sender_id] = (unreadCounts[row.sender_id] || 0) + 1;
+    updateBadge();
+    announceMessage(row.sender_id, 1, row.content);
+    if (!$('matchesPanel').classList.contains('hidden')) loadMatches();
+  }
+
+  async function pollNotifications() {
+    if (!currentUser) return;
+    try {
+      const ids = await computeMatchIds();
+      ids.forEach(id => { if (!knownMatchIds.has(id)) registerNewMatch(id); });
+      await loadUnread();
+      const bySender = {};
+      unreadList.forEach(m => {
+        if (notifiedMsgIds.has(m.id)) return;
+        notifiedMsgIds.add(m.id);
+        if (chatPartner && chatPartner.id === m.sender_id) return;
+        (bySender[m.sender_id] = bySender[m.sender_id] || []).push(m);
+      });
+      Object.entries(bySender).forEach(([sid, arr]) => announceMessage(sid, arr.length, arr[arr.length - 1].content));
+    } catch (e) {}
+  }
+
+  function showNotifBanner() {
+    const el = $('notifBanner');
+    if (!el) return;
+    el.classList.toggle('hidden', !('Notification' in window) || Notification.permission !== 'default');
+  }
+  $('notifEnable').addEventListener('click', async () => {
+    try { await Notification.requestPermission(); } catch (e) {}
+    showNotifBanner();
+  });
+
+  async function startNotifications() {
+    if (!currentUser || notifyStarted) return;
+    notifyStarted = true;
+    showNotifBanner();
+    try {
+      const ids = await computeMatchIds();
+      knownMatchIds = new Set(ids);
+      const stored = lsGet(seenKey());
+      if (Array.isArray(stored)) {
+        const fresh = ids.filter(i => !stored.includes(i));
+        if (fresh.length) {
+          newMatchCount = fresh.length;
+          toast(t('new_matches', { n: fresh.length }), t('tap_view'), () => setTab('matches'));
+        }
+      } else saveSeen();
+    } catch (e) {}
+    await loadUnread();
+    notifiedMsgIds = new Set(unreadList.map(m => m.id));
+    if (unreadList.length) toast(t('unread_msgs', { n: unreadList.length }), t('tap_view'), () => setTab('matches'));
+    updateBadge();
+    try {
+      notifyMsgChannel = client.channel('vow-notify-msg-' + currentUser.id)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `receiver_id=eq.${currentUser.id}` }, p => onNewMessage(p.new))
+        .subscribe();
+    } catch (e) {}
+    try {
+      notifySwipeChannel = client.channel('vow-notify-swipe-' + currentUser.id)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'swipes', filter: `target_user_id=eq.${currentUser.id}` }, p => onIncomingLike(p.new))
+        .subscribe();
+    } catch (e) {}
+    notifyPoll = setInterval(pollNotifications, 15000);
+  }
+
+  function stopNotifications() {
+    if (notifyPoll) { clearInterval(notifyPoll); notifyPoll = null; }
+    [notifyMsgChannel, notifySwipeChannel].forEach(ch => { if (ch) { try { client.removeChannel(ch); } catch (e) {} } });
+    notifyMsgChannel = null; notifySwipeChannel = null;
+    notifyStarted = false;
+    knownMatchIds = new Set(); notifiedMsgIds = new Set();
+    newMatchCount = 0; unreadCounts = {}; unreadList = [];
+    updateBadge();
+  }
+
   function setTab(tab) {
     $('discoverPanel').classList.toggle('hidden', tab !== 'discover');
     $('matchesPanel').classList.toggle('hidden', tab !== 'matches');
@@ -665,7 +934,7 @@ alter publication supabase_realtime add table public.messages;
     if (tab !== 'matches') stopChat();
     $('chatPanel').classList.add('hidden');
     document.querySelectorAll('.tabs button').forEach(button => button.classList.toggle('active', button.dataset.tab === tab));
-    if (tab === 'matches') loadMatches();
+    if (tab === 'matches') { newMatchCount = 0; saveSeen(); updateBadge(); loadMatches(); }
   }
 
   document.querySelectorAll('.tabs button').forEach(button => {
@@ -682,10 +951,12 @@ alter publication supabase_realtime add table public.messages;
   $('logoutBtn').addEventListener('click', async () => {
     const { error } = await client.auth.signOut();
     if (error) {
-      alert('تعذّر تسجيل الخروج: ' + error.message);
+      alert(t('err_logout') + error.message);
       return;
     }
     stopChat();
+    stopNotifications();
+    peopleLoaded = false;
     matchList = [];
     unreadCounts = {};
     currentUser = null;
@@ -708,6 +979,7 @@ alter publication supabase_realtime add table public.messages;
 
   client.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_OUT') {
+      stopNotifications();
       currentUser = null;
       profile = null;
       showAuth();
@@ -715,6 +987,7 @@ alter publication supabase_realtime add table public.messages;
   });
 
   setAuthMode(true);
+  applyLang();
   boot();
 })();
 </script>
