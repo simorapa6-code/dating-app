@@ -62,12 +62,14 @@
     <section id="mainView">
       <div id="discoverPanel" class="panel">
         <div class="eyebrow">Discover</div><h2 class="heading">Meet someone new.</h2>
-        <p class="sub">Swipe right to like or left to pass. These are sample profiles for preview only.</p>
-        <div id="peopleList"></div>
+        <p class="sub">Discover real VOW members. Swipe right to like or left to pass.</p>
+        <div id="peopleList"><div class="empty">Loading profiles…</div></div>
+        <div id="discoverMsg" class="msg"></div>
       </div>
       <div id="matchesPanel" class="panel hidden">
         <div class="eyebrow">Your connections</div><h2 class="heading">Matches</h2>
-        <div class="empty">Your likes are a preview only. Real matching and messaging need a likes/matches database.</div>
+        <div id="matchesList"><div class="empty">Loading your matches…</div></div>
+        <p class="notice">A match appears when both people like each other. Chat is not connected yet.</p>
       </div>
       <div id="myProfilePanel" class="panel hidden">
         <div class="eyebrow">Your account</div><h2 class="heading">My profile</h2>
@@ -93,11 +95,11 @@
   let isSignup = true;
   let currentUser = null;
   let profile = null;
-  let sampleIndex = 0;
+  let people = [];
+  let personIndex = 0;
   let swipeStartX = 0;
-  let swipeStartY = 0;
   let activeCard = null;
-  const sampleDecisions = [];
+  let busySwipe = false;
 
   function message(id, text, error = false) {
     const el = $(id);
@@ -195,8 +197,11 @@
       const complete = !!(profile.full_name && profile.age && profile.gender);
       $('setupView').classList.toggle('hidden', complete);
       $('mainView').classList.toggle('hidden', !complete);
-      if (complete) setTab('discover');
-      renderSamples();
+      if (complete) {
+        setTab('discover');
+        await loadDiscover();
+        await loadMatches();
+      }
     } catch (error) {
       showAuth();
       message('authMsg', 'You are logged in, but your profile could not be loaded: ' + error.message, true);
@@ -242,6 +247,8 @@
       $('mainView').classList.remove('hidden');
       renderProfile();
       setTab('discover');
+      await loadDiscover();
+      await loadMatches();
       message('profileMsg', 'Profile saved successfully.');
     } catch (error) {
       message('profileMsg', error.message || 'Could not save your profile.', true);
@@ -268,35 +275,55 @@
       <p class="notice">${escapeHTML(currentUser?.email || '')}</p></div>`;
   }
 
-  const samples = [
-    {name:'Amina',age:27,city:'Sample city',bio:'I enjoy meaningful conversations, family time and discovering new places.',symbol:'A'},
-    {name:'Yassine',age:30,city:'Sample city',bio:'Curious, positive and always learning something new.',symbol:'Y'},
-    {name:'Salma',age:25,city:'Sample city',bio:'Books, coffee, nature and a good sense of humour.',symbol:'S'}
-  ];
-
-  function renderSamples() {
+  async function loadDiscover() {
     const list = $('peopleList');
-    if (sampleIndex >= samples.length) {
-      list.innerHTML = `<div class="empty"><div style="font-size:38px;margin-bottom:10px">♡</div><h3 class="heading">You've seen everyone.</h3><p class="sub">There are no more sample profiles right now. Real profiles will appear when discovery is connected to the database.</p><button class="btn secondary" id="restartSamples">Start again</button></div>`;
-      $('restartSamples').addEventListener('click', () => {
-        sampleIndex = 0;
-        sampleDecisions.length = 0;
-        renderSamples();
-      });
+    list.innerHTML = '<div class="empty">Loading real profiles…</div>';
+    message('discoverMsg', '');
+    try {
+      const [{ data: allProfiles, error: profileError }, { data: mySwipes, error: swipeError }] = await Promise.all([
+        client.from('profiles').select('id,full_name,age,gender,country,city,bio,profile_data').limit(200),
+        client.from('swipes').select('target_user_id').eq('user_id', currentUser.id)
+      ]);
+      if (profileError) throw profileError;
+      if (swipeError) throw swipeError;
+      const alreadySeen = new Set((mySwipes || []).map(item => item.target_user_id));
+      people = (allProfiles || []).filter(person =>
+        person.id !== currentUser.id && !alreadySeen.has(person.id) &&
+        person.full_name && Number(person.age) >= 18 && person.gender
+      );
+      personIndex = 0;
+      renderPerson();
+    } catch (error) {
+      list.innerHTML = '<div class="empty">Could not load profiles from the database.</div>';
+      message('discoverMsg', error.message || 'Please try again.', true);
+    }
+  }
+
+  function renderPerson() {
+    const list = $('peopleList');
+    if (personIndex >= people.length) {
+      list.innerHTML = `<div class="empty"><div style="font-size:38px;margin-bottom:10px">♡</div><h3 class="heading">You are all caught up.</h3><p class="sub">There are no new VOW profiles to show right now.</p><button class="btn secondary" id="refreshPeople">Refresh profiles</button></div>`;
+      $('refreshPeople').addEventListener('click', loadDiscover);
       return;
     }
-    const person = samples[sampleIndex];
+    const person = people[personIndex];
+    const initial = escapeHTML((person.full_name || 'V').trim().charAt(0).toUpperCase());
+    const name = escapeHTML(person.full_name || 'VOW member');
+    const age = Number(person.age);
+    const location = escapeHTML([person.city, person.country].filter(Boolean).join(', ') || 'Location not added');
+    const bio = escapeHTML(person.bio || 'This member has not added a bio yet.');
+    const values = escapeHTML(person.profile_data?.values || '');
     list.innerHTML = `
       <div class="swipe-stage" id="swipeStage">
         <article class="swipe-card" id="swipeCard">
-          <div class="sample-art"><span>${person.symbol}</span></div>
+          <div class="sample-art"><span>${initial}</span></div>
           <div class="swipe-stamp like" id="likeStamp">LIKE</div>
           <div class="swipe-stamp pass" id="passStamp">PASS</div>
-          <div class="eyebrow">Sample profile · ${sampleIndex + 1} of ${samples.length}</div>
-          <h3>${escapeHTML(person.name)}, ${person.age}</h3>
-          <p class="sub">${escapeHTML(person.city)}</p>
-          <p>${escapeHTML(person.bio)}</p>
-          <span class="chip">Preview only</span>
+          <div class="eyebrow">VOW member · ${personIndex + 1} of ${people.length}</div>
+          <h3>${name}, ${age}</h3>
+          <p class="sub">${location}</p>
+          <p>${bio}</p>
+          ${values ? `<span class="chip">${values}</span>` : ''}
         </article>
       </div>
       <div class="swipe-actions">
@@ -307,41 +334,55 @@
     bindSwipe();
   }
 
-  function decideSwipe(direction) {
-    if (sampleIndex >= samples.length) return;
-    const person = samples[sampleIndex];
-    sampleDecisions.push({name: person.name, decision: direction});
+  async function decideSwipe(direction) {
+    if (busySwipe || personIndex >= people.length || !currentUser) return;
+    busySwipe = true;
+    const person = people[personIndex];
     const card = $('swipeCard');
+    const passButton = $('passButton');
+    const likeButton = $('likeButton');
+    passButton.disabled = true;
+    likeButton.disabled = true;
     if (card) {
       card.style.transform = direction === 'like' ? 'translateX(120%) rotate(18deg)' : 'translateX(-120%) rotate(-18deg)';
       card.style.opacity = '0';
     }
-    window.setTimeout(() => {
-      sampleIndex++;
-      renderSamples();
-    }, 180);
+    try {
+      const { error } = await client.from('swipes').upsert({
+        user_id: currentUser.id,
+        target_user_id: person.id,
+        action: direction
+      }, { onConflict: 'user_id,target_user_id' });
+      if (error) throw error;
+      personIndex++;
+      busySwipe = false;
+      renderPerson();
+      if (direction === 'like') await loadMatches();
+    } catch (error) {
+      busySwipe = false;
+      if (card) { card.style.transform = ''; card.style.opacity = '1'; }
+      passButton.disabled = false;
+      likeButton.disabled = false;
+      message('discoverMsg', 'Could not save your choice: ' + (error.message || 'Please try again.'), true);
+    }
   }
 
   function bindSwipe() {
     const card = $('swipeCard');
     if (!card) return;
-
     card.style.touchAction = 'pan-y';
-    
     $('passButton').addEventListener('click', () => decideSwipe('pass'));
     $('likeButton').addEventListener('click', () => decideSwipe('like'));
     card.addEventListener('pointerdown', event => {
       if (event.target.closest('button')) return;
       swipeStartX = event.clientX;
-      swipeStartY = event.clientY;
       activeCard = card;
       card.setPointerCapture(event.pointerId);
     });
     card.addEventListener('pointermove', event => {
       if (!activeCard || activeCard !== card) return;
       const dx = event.clientX - swipeStartX;
-      const dy = event.clientY - swipeStartY;
-      if (Math.abs(dx) > Math.abs(dy)) {
+      if (Math.abs(dx) > 4) {
         card.style.transition = 'none';
         card.style.transform = `translateX(${dx}px) rotate(${dx * 0.06}deg)`;
         $('likeStamp').style.opacity = dx > 25 ? Math.min(dx / 100, 1) : 0;
@@ -365,11 +406,47 @@
     card.addEventListener('pointercancel', finish);
   }
 
+  async function loadMatches() {
+    const list = $('matchesList');
+    if (!list || !currentUser) return;
+    list.innerHTML = '<div class="empty">Loading your matches…</div>';
+    try {
+      const { data: incoming, error: incomingError } = await client.from('swipes')
+        .select('user_id').eq('target_user_id', currentUser.id).eq('action', 'like');
+      if (incomingError) throw incomingError;
+      const incomingIds = [...new Set((incoming || []).map(item => item.user_id).filter(id => id !== currentUser.id))];
+      if (!incomingIds.length) {
+        list.innerHTML = '<div class="empty">No matches yet. Keep discovering.</div>';
+        return;
+      }
+      const { data: outgoing, error: outgoingError } = await client.from('swipes')
+        .select('target_user_id').eq('user_id', currentUser.id).eq('action', 'like').in('target_user_id', incomingIds);
+      if (outgoingError) throw outgoingError;
+      const matchIds = (outgoing || []).map(item => item.target_user_id);
+      if (!matchIds.length) {
+        list.innerHTML = '<div class="empty">No mutual likes yet. When someone you liked likes you back, they will appear here.</div>';
+        return;
+      }
+      const { data: matchedProfiles, error: matchedError } = await client.from('profiles')
+        .select('id,full_name,age,city,country,bio').in('id', matchIds);
+      if (matchedError) throw matchedError;
+      list.innerHTML = (matchedProfiles || []).map(person => `
+        <div class="profile-card"><div class="avatar">${escapeHTML((person.full_name || 'V').trim().charAt(0).toUpperCase())}</div>
+        <h3 class="heading">${escapeHTML(person.full_name || 'VOW member')}${person.age ? ', ' + Number(person.age) : ''}</h3>
+        <p class="sub">${escapeHTML([person.city, person.country].filter(Boolean).join(', '))}</p>
+        <span class="chip">♡ Mutual match</span></div>`).join('') || '<div class="empty">No matches to show.</div>';
+    } catch (error) {
+      list.innerHTML = '<div class="empty">Could not load matches.</div>';
+      console.error('VOW matches error:', error);
+    }
+  }
+
   function setTab(tab) {
     $('discoverPanel').classList.toggle('hidden', tab !== 'discover');
     $('matchesPanel').classList.toggle('hidden', tab !== 'matches');
     $('myProfilePanel').classList.toggle('hidden', tab !== 'profile');
     document.querySelectorAll('.tabs button').forEach(button => button.classList.toggle('active', button.dataset.tab === tab));
+    if (tab === 'matches') loadMatches();
   }
 
   document.querySelectorAll('.tabs button').forEach(button => {
@@ -391,6 +468,8 @@
     }
     currentUser = null;
     profile = null;
+    people = [];
+    personIndex = 0;
     showAuth();
     setAuthMode(false);
   });
